@@ -1,0 +1,8 @@
+{
+  "name": "gmail-campaign-manager",
+  "version": "4.0.0",
+  "private": true,
+  "description": "Personalised one-by-one Gmail sending from a CSV. Single user, hosted on Vercel.",
+  "engines": { "node": ">=18" },
+  "dependencies": { "nodemailer": "^6.9.16" }
+}
