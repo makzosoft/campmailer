@@ -329,6 +329,17 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
 .linkbtn:hover{color:var(--ink)}
 #loginErr{animation:fadeUp .3s var(--ease)}
 
+/* ===== body mode tabs + raw HTML ===== */
+.modetabs{display:flex;gap:4px;padding:10px 20px 0}
+.modetab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:7px;padding:5px 12px;font-size:12.5px;font-weight:600;transition:background .15s,color .15s,border-color .15s}
+.modetab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.modetab:not(.on):hover{border-color:var(--blue);color:var(--blue)}
+#bodyHtml{display:block;width:100%;min-height:230px;border:0;outline:0;resize:vertical;padding:14px 20px;font:12.5px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;background:#fbfcfe;color:var(--ink);white-space:pre;overflow-wrap:normal;overflow-x:auto}
+#bodyHtml::placeholder{font-family:"Segoe UI",system-ui,sans-serif;white-space:pre-wrap}
+.pv-body{padding:0}
+.pv-body.text-pad{padding:14px}
+#pvFrame{display:block;width:100%;border:0;min-height:110px;background:#fff}
+
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 </style>
 </head>
@@ -396,7 +407,12 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
       <div class="hdr padr"><span class="lbl">From</span><span class="val" id="fromVal">…</span></div>
       <div class="hdr padr"><span class="lbl">To</span><span class="val" id="toVal">Add recipients on the left</span></div>
       <div class="hdr"><label class="lbl" for="subject">Subject</label><input id="subject" placeholder="What is this about?" autocomplete="off"></div>
+      <div class="modetabs" role="tablist" aria-label="Message format">
+        <button type="button" class="modetab on" id="modeText" role="tab" aria-selected="true">Plain text</button>
+        <button type="button" class="modetab" id="modeHtml" role="tab" aria-selected="false">Raw HTML</button>
+      </div>
       <textarea id="body" placeholder="Write your message. Use {{first_name}} to greet each person by name."></textarea>
+      <textarea id="bodyHtml" placeholder="Paste your HTML email code here. {{first_name}} and your other fields work inside it too." hidden spellcheck="false"></textarea>
       <div class="issues" id="issues"></div>
       <div class="fieldsbar" id="fieldsBar" hidden>
         <div class="sub">Click a field to insert it. Add a fallback with <code>{{first_name|there}}</code>.</div>
@@ -412,9 +428,10 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
       <div class="panel-body">
         <div class="pv">
           <div class="pv-head"><div class="pv-to" id="pvTo">To: (no recipient yet)</div><div class="pv-subj" id="pvSubj">(no subject)</div></div>
-          <div class="pv-body" id="pvBody"></div>
+          <div class="pv-body text-pad" id="pvBody"></div>
+          <iframe class="pv-body" id="pvFrame" title="HTML email preview" sandbox="allow-same-origin" hidden></iframe>
         </div>
-        <div class="sub legend">Highlighted text is filled in from your list. Amber means the value is empty, red means the field doesn't exist.</div>
+        <div class="sub legend" id="pvLegend">Highlighted text is filled in from your list. Amber means the value is empty, red means the field doesn't exist.</div>
       </div>
     </section>
   </div>
@@ -536,8 +553,10 @@ const S = {
   filter: 'all', query: '', previewId: null,
   info: null, sending: false, stop: false, confirming: false,
   testSent: false, summary: '', progress: { done: 0, total: 0, current: '' }, lastField: 'body',
-  prev: {}, barState: '', wasReady: false, animateRows: false, restoredMsg: ''
+  prev: {}, barState: '', wasReady: false, animateRows: false, restoredMsg: '', bodyMode: 'text'
 };
+function activeBodyEl() { return S.bodyMode === 'html' ? $('#bodyHtml') : $('#body'); }
+function bodyVal() { return activeBodyEl().value; }
 const rowById = id => S.rows.find(r => r.id === id);
 const selectable = r => r.status === 'ready' || r.status === 'failed';
 const pending = () => S.rows.filter(r => r.selected && selectable(r));
@@ -674,7 +693,7 @@ function merge(tpl, row, html) {
   return out + e(String(tpl || '').slice(last));
 }
 function analyze() {
-  const text = $('#subject').value + '\n' + $('#body').value;
+  const text = $('#subject').value + '\n' + bodyVal();
   const unknown = new Set(), empties = {};
   if (!S.columns.length) return { unknown: [], empties };
   const pend = pending();
@@ -783,15 +802,26 @@ function renderPreview() {
     clearTimeout(pv._t); pv._t = setTimeout(() => pv.classList.remove('swap'), 900);
   }
   S.lastPreview = S.previewId; S.lastIdx = idx;
-  const subj = $('#subject').value, body = $('#body').value;
+  const subj = $('#subject').value, body = bodyVal();
   $('#pvSubj').innerHTML = subj ? merge(subj, r, true) : '<span class="sub">(no subject)</span>';
-  $('#pvBody').innerHTML = body ? merge(body, r, true) : '<span class="sub">Your message will appear here as each person will see it.</span>';
+  const textPane = $('#pvBody'), frame = $('#pvFrame'), legend = $('#pvLegend');
+  if (S.bodyMode === 'html') {
+    textPane.hidden = true; frame.hidden = false;
+    const merged = body ? merge(body, r, false) : '';
+    const doc = merged || '<p style="font:14px sans-serif;color:#8a96a6">Paste HTML above to see it rendered here.</p>';
+    if (frame.srcdoc !== doc) frame.srcdoc = doc;
+    legend.textContent = "This is your HTML rendered as the recipient's email client would show it. Merge fields are filled in from your list; an unknown field like {{Nme}} is left exactly as written.";
+  } else {
+    frame.hidden = true; textPane.hidden = false;
+    textPane.innerHTML = body ? merge(body, r, true) : '<span class="sub">Your message will appear here as each person will see it.</span>';
+    legend.textContent = "Highlighted text is filled in from your list. Amber means the value is empty, red means the field doesn't exist.";
+  }
 }
 
 function blockers() {
   const b = [];
   if (!$('#subject').value.trim()) b.push('Add a subject');
-  if (!$('#body').value.trim()) b.push('Write your message');
+  if (!bodyVal().trim()) b.push('Write your message');
   if (!S.rows.length) b.unshift('Add recipients');
   else if (!pending().length) b.push('Select at least one recipient');
   if (analyze().unknown.length) b.push('Fix unknown fields');
@@ -812,7 +842,7 @@ function setBarState(el, key) {
 }
 function renderBar() {
   const el = $('#sendin'), demo = S.info && S.info.mode !== 'live';
-  const can = !!$('#subject').value.trim() && !!$('#body').value.trim() && !!S.info;
+  const can = !!$('#subject').value.trim() && !!bodyVal().trim() && !!S.info;
   if (S.sending) {
     setBarState(el, 'sending'); S.wasReady = false;
     const p = S.progress, pct = p.total ? Math.round(p.done / p.total * 100) : 0;
@@ -888,7 +918,7 @@ function save() {
   saveTimer = setTimeout(() => {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify({
-        subject: $('#subject').value, body: $('#body').value, columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol,
+        subject: $('#subject').value, body: $('#body').value, bodyHtml: $('#bodyHtml').value, bodyMode: S.bodyMode, columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol,
         source: S.source, previewId: S.previewId, testSent: S.testSent,
         rows: S.rows.map(r => ({ id: r.id, data: r.data, status: r.status === 'sending' ? 'ready' : r.status, selected: r.selected, error: r.error }))
       }));
@@ -899,7 +929,7 @@ function restore() {
   try {
     const d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
     if (!d) return false;
-    $('#subject').value = d.subject || ''; $('#body').value = d.body || '';
+    $('#subject').value = d.subject || ''; $('#body').value = d.body || ''; $('#bodyHtml').value = d.bodyHtml || ''; setBodyMode(d.bodyMode === 'html' ? 'html' : 'text', true);
     if (d.rows && d.rows.length) {
       S.columns = d.columns; S.emailCol = d.emailCol; S.nameCol = d.nameCol; S.source = d.source || 'Saved list';
       S.rows = d.rows.map(r => Object.assign({ email: '' }, r)); S.previewId = d.previewId; S.testSent = !!d.testSent;
@@ -922,12 +952,12 @@ function loadText(text, source) {
     const skipped = S.rows.filter(r => r.status === 'invalid' || r.status === 'duplicate').length;
     const ready = S.rows.filter(r => r.status === 'ready').length;
     toast('Loaded ' + plural(ready, 'recipient') + (skipped ? ', skipped ' + skipped : '') + '.', 'good');
-    if (!$('#body').value.trim()) {
+    if (S.bodyMode !== 'html' && !$('#body').value.trim()) {
       const first = S.nameCol || S.columns.some(c => norm(c) === 'firstname');
       $('#body').value = (first ? 'Hi {{first_name|there}},' : 'Hello,') + '\n\n\n\nThanks,\n' + (S.info ? S.info.name : '');
     }
     render();
-    const target = $('#subject').value.trim() ? $('#body') : $('#subject');
+    const target = $('#subject').value.trim() ? activeBodyEl() : $('#subject');
     if (window.innerWidth > 900) target.focus();
   } catch (e) { err.textContent = errMsg(e); err.hidden = false; toast(errMsg(e), 'bad'); }
 }
@@ -945,7 +975,7 @@ function sampleCSV() {
     'Ada Obi,' + a('ada').toUpperCase() + ',Obi Ltd', 'Chidi Okafor,chidi.okafor@example,Okafor Studio', 'Zainab Musa,' + a('zainab') + ',Musa Foods'].join('\n');
 }
 function insertField(name) {
-  const el = S.lastField === 'subject' ? $('#subject') : $('#body');
+  const el = S.lastField === 'subject' ? $('#subject') : (S.lastField === 'bodyHtml' ? $('#bodyHtml') : $('#body'));
   const f = '{{' + name + '}}', s = el.selectionStart == null ? el.value.length : el.selectionStart, e = el.selectionEnd == null ? s : el.selectionEnd;
   el.value = el.value.slice(0, s) + f + el.value.slice(e);
   el.focus(); el.selectionStart = el.selectionEnd = s + f.length;
@@ -963,11 +993,11 @@ function replaceList() {
 
 async function sendTest() {
   const r = previewRow();
-  const subject = merge($('#subject').value.trim(), r, false), body = merge($('#body').value.trim(), r, false);
+  const subject = merge($('#subject').value.trim(), r, false), body = merge(bodyVal().trim(), r, false);
   if (!subject || !body) return toast('Add a subject and message first.', 'bad');
   const btn = $('#btnTest'); if (btn) { btn.disabled = true; btn.textContent = 'Sending test…'; }
   try {
-    await T.send({ recipient: S.info.sender, subject: '[Test] ' + subject, body });
+    await T.send({ recipient: S.info.sender, subject: '[Test] ' + subject, body, isHtml: S.bodyMode === 'html' });
     S.testSent = true;
     toast('Test sent to ' + S.info.sender + '. Check your inbox.', 'good');
   } catch (e) { if (e.status === 401) authFailed(); else toast('Test failed: ' + errMsg(e), 'bad'); }
@@ -977,7 +1007,7 @@ async function sendTest() {
 async function runSend() {
   const list = pending().slice(0, sendCount());
   if (!list.length) return;
-  const subjTpl = $('#subject').value.trim(), bodyTpl = $('#body').value.trim();
+  const subjTpl = $('#subject').value.trim(), tpl = bodyVal().trim(), isHtml = S.bodyMode === 'html';
   S.sending = true; S.stop = false; S.confirming = false; S.summary = '';
   S.progress = { done: 0, total: list.length, current: '' };
   let sent = 0, failed = 0, streak = 0, halted = '';
@@ -985,7 +1015,7 @@ async function runSend() {
     if (S.stop) break;
     r.status = 'sending'; r.error = ''; S.progress.current = r.email; renderNow();
     try {
-      await T.send({ recipient: r.email, subject: merge(subjTpl, r, false), body: merge(bodyTpl, r, false) });
+      await T.send({ recipient: r.email, subject: merge(subjTpl, r, false), body: merge(tpl, r, false), isHtml });
       r.status = 'sent'; r.selected = false; r.flash = 'sent'; sent++; streak = 0;
     } catch (e) {
       r.status = 'failed'; r.error = errMsg(e); r.flash = 'failed'; failed++; streak++;
@@ -1016,9 +1046,10 @@ function authFailed() {
 $('#btnChoose').onclick = () => $('#file').click();
 $('#file').onchange = e => { loadFile(e.target.files[0]); e.target.value = ''; };
 $('#btnSample').onclick = () => {
-  const hadMessage = $('#subject').value.trim() || $('#body').value.trim();
+  const hadMessage = $('#subject').value.trim() || $('#body').value.trim() || $('#bodyHtml').value.trim();
   loadText(sampleCSV(), 'Sample data');
   if (!hadMessage) {
+    setBodyMode('text', true);
     $('#subject').value = 'A quick hello from {{Company|us}}';
     $('#body').value = 'Hi {{first_name|there}},\n\nI wanted to reach out about {{Company|your team}}.\n\nThanks,\n' + (S.info ? S.info.name : '');
     render();
@@ -1065,7 +1096,18 @@ $('#checkAll').onchange = e => {
 };
 $('#subject').addEventListener('focus', () => S.lastField = 'subject');
 $('#body').addEventListener('focus', () => S.lastField = 'body');
-['#subject', '#body'].forEach(s => $(s).addEventListener('input', () => { S.summary = ''; S.confirming = false; render(); }));
+$('#bodyHtml').addEventListener('focus', () => S.lastField = 'bodyHtml');
+['#subject', '#body', '#bodyHtml'].forEach(s => $(s).addEventListener('input', () => { S.summary = ''; S.confirming = false; render(); }));
+function setBodyMode(mode, silent) {
+  mode = mode === 'html' ? 'html' : 'text';
+  S.bodyMode = mode;
+  $('#modeText').classList.toggle('on', mode === 'text'); $('#modeText').setAttribute('aria-selected', mode === 'text');
+  $('#modeHtml').classList.toggle('on', mode === 'html'); $('#modeHtml').setAttribute('aria-selected', mode === 'html');
+  $('#body').hidden = mode === 'html'; $('#bodyHtml').hidden = mode !== 'html';
+  if (!silent) { S.summary = ''; S.confirming = false; render(); activeBodyEl().focus(); }
+}
+$('#modeText').onclick = () => S.bodyMode !== 'text' && setBodyMode('text');
+$('#modeHtml').onclick = () => S.bodyMode !== 'html' && setBodyMode('html');
 $('#chips').onclick = e => { const b = e.target.closest('[data-field]'); if (b) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); insertField(b.dataset.field); } };
 $('#pvPrev').onclick = () => stepPreview(-1);
 $('#pvNext').onclick = () => stepPreview(1);
@@ -1157,7 +1199,7 @@ $('#btnSignOut').onclick = e => {
   const go = () => {
     Account.clear(); demoMem = false; try { sessionStorage.removeItem('gcm.demo'); } catch (x) {}
     S.info = null; S.testSent = false; S.summary = '';
-    $('#subject').value = ''; $('#body').value = '';
+    $('#subject').value = ''; $('#body').value = ''; $('#bodyHtml').value = ''; setBodyMode('text', true);
     replaceList(); clearSaved();
     ['#lgEmail', '#lgName'].forEach(s => $(s).value = '');
     renderQuota(); showLogin();
