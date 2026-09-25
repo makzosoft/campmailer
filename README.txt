@@ -44,6 +44,12 @@ WHERE YOUR DETAILS LIVE
 
 
 USING IT
+  - Above the message box, "Plain text" / "Raw HTML" switches how you write the
+    body. Raw HTML is for pasting a full HTML email template (tables, styles,
+    images, buttons). It sends as real HTML with a plain-text fallback built in,
+    and the Preview panel renders it in an isolated frame so you see it exactly
+    as a recipient would. Merge fields like {{Name}} work inside pasted HTML too.
+    Script tags and inline event handlers (onclick etc.) are stripped for safety.
   - Paste or drop a CSV and it loads immediately. Comma, semicolon and tab files
     work, a plain list of emails works, and the email and name columns are found
     for you. Invalid and duplicate addresses are skipped automatically.
