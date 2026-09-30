@@ -9,7 +9,8 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   const want = process.env.CRON_SECRET;
 
-  console.log(want)
+  if (alert) alert(want)
+  
   const auth = String(req.headers.authorization || '');
   const url = new URL(req.url, 'http://x');
   const key = (req.query && req.query.key) || url.searchParams.get('key') || '';
