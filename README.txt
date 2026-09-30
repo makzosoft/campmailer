@@ -5,18 +5,76 @@ personalised email from your Gmail. There are no settings to configure on the
 server: you connect your Gmail inside the app.
 
 
-DEPLOY TO VERCEL (about 3 minutes)
+DEPLOY TO VERCEL (about 5 minutes)
   1. Put this folder in a GitHub repo (private is best).
   2. vercel.com > Add New > Project > import the repo > Deploy.
-     Leave every setting as it is. No environment variables are needed.
+     Leave every setting as it is.
   3. Open the URL Vercel gives you. The first screen asks for:
        - your Gmail address
        - an App Password (explained below)
        - your name, as recipients should see it
      Press Connect Gmail. You stay signed in on that browser until you press
      Sign out (top right).
+  This app is not just for you — anyone can open the same link and sign in
+  with their own Gmail. Nobody's details are stored on the server, and nobody
+  sees anyone else's sign-in. Each person's session lives only in their own
+  browser.
 
   Command-line alternative: npm install, then "npx vercel".
+
+
+SCHEDULED SENDING — optional, two settings on Vercel
+  Lets a campaign send on its own, even with your browser closed. It runs on
+  Vercel's own servers — not your phone, and not Google Apps Script. Two
+  one-time settings:
+
+  1. A database for the queue (a few clicks, no typing):
+     Vercel dashboard > your project > Storage tab > Marketplace >
+     add an Upstash Redis (or "KV") database > Connect to this project.
+     Vercel fills in its own environment variables for you.
+
+  2. A secret so only you can trigger a send:
+     Project > Settings > Environment Variables > add CRON_SECRET, value
+     = any long random string (a password generator works fine). This
+     also becomes the key each App Password is encrypted with while its
+     schedule is running, so treat it like a real secret. Redeploy once
+     after adding it (Deployments > latest > Redeploy) so it takes effect.
+
+  That's it. Whoever is signed in, in the app, can press "Schedule daily
+  sending instead" under Send, set two numbers, and start it:
+    - Emails per day — the most that will ever go out in one calendar day
+      (UTC), no matter how it's triggered.
+    - Emails per check-in — how many go out each time the sending route is
+      pinged, so a day's total can be spread across several smaller sends
+      instead of arriving in one burst.
+  A bar at the bottom shows progress and a Cancel button; it stays there for
+  anyone who opens the app, regardless of who is signed in, and survives
+  closing the browser or signing out.
+
+  Vercel's free plan only runs its OWN once-a-day Cron entry (already set up
+  in vercel.json, no edits needed) — so left alone, "per check-in" and "per
+  day" become the same number, arriving in one batch around 8am UTC (9am in
+  Lagos all year; Nigeria doesn't change clocks for daylight saving).
+
+  TO ACTUALLY SPREAD SENDS ACROSS THE DAY ON THE FREE PLAN
+  Add a free outside pinger — a service that just visits a URL on a timer —
+  pointed at:
+      https://YOUR-APP.vercel.app/api/cron/run?key=YOUR_CRON_SECRET
+  (same CRON_SECRET as above; this URL form exists because most free pingers
+  can't send custom headers). cron-job.org is one such free service: sign up,
+  add that URL, set it to run every 1-2 hours during the hours you want
+  sending to happen. Every visit sends one "per check-in" slice; once a day's
+  cap is reached, extra visits that day just do nothing, so pinging often is
+  always safe — it never sends more than your daily cap.
+
+  Notes:
+    - A failed address (bad email, bounced, etc.) is never retried — it's
+      logged under "failed" and doesn't count against later check-ins.
+    - Your Gmail sign-in for a running schedule is encrypted and held only
+      for as long as that campaign is still sending; it's deleted the
+      moment the campaign finishes or is canceled.
+    - Skip both settings if you don't need this — the app works exactly as
+      before, and "Schedule" just won't be offered.
 
 
 WHAT IS AN APP PASSWORD?
