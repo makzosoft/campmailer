@@ -340,6 +340,31 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
 .pv-body.text-pad{padding:14px}
 #pvFrame{display:block;width:100%;border:0;min-height:110px;background:#fff}
 
+/* ===== scheduling ===== */
+#schedBar{position:fixed;left:0;right:0;bottom:66px;background:var(--ink);color:#fff;z-index:19;transform:translateY(0);transition:transform .3s var(--ease)}
+#schedBar[hidden]{display:none}
+.schedin{max-width:1280px;margin:0 auto;padding:9px 24px;display:flex;align-items:center;gap:14px;font-size:13px}
+.schedin .sdot{width:7px;height:7px;border-radius:50%;background:#5ee6a8;flex:none;animation:beat 2.6s ease-in-out infinite}
+.schedin b{font-weight:700}
+.schedin .sbar{flex:1;height:5px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden;max-width:260px}
+.schedin .sbar i{display:block;height:100%;background:#5ee6a8;transition:width .4s var(--ease)}
+.schedin .snote{color:rgba(255,255,255,.65);white-space:nowrap}
+.schedin button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:6px;padding:4px 10px;font-size:12.5px;font-weight:600;flex:none}
+.schedin button:hover{background:rgba(255,255,255,.24)}
+@media(max-width:900px){.schedin{padding:8px 14px;flex-wrap:wrap}.schedin .sbar{order:5;flex-basis:100%;max-width:none}}
+
+.schedpop{position:fixed;inset:0;background:rgba(11,21,38,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:640px){.schedpop{align-items:center}}
+.schedpop[hidden]{display:none}
+.schedcard{background:#fff;border-radius:14px 14px 0 0;padding:22px;width:100%;max-width:420px;animation:rise .25s var(--ease)}
+@media(min-width:640px){.schedcard{border-radius:14px}}
+.schedcard h3{margin:0 0 4px;font-size:16px}
+.schedcard p{margin:0 0 16px;color:var(--muted);font-size:13px}
+.schedcard label{font-size:12.5px;font-weight:600;color:var(--muted);display:block;margin-bottom:6px}
+.schedcard input{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14.5px}
+.schedcard .row{display:flex;gap:10px;margin-top:18px}
+.schedcard .row .btn{flex:1}
+
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 </style>
 </head>
@@ -439,6 +464,19 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
 </main>
 
 <footer class="sendbar"><div class="sendin" id="sendin"></div></footer>
+<div id="schedBar" hidden><div class="schedin" id="schedin"></div></div>
+<div class="schedpop" id="schedPop" hidden>
+  <div class="schedcard">
+    <h3>Schedule daily sending</h3>
+    <p>Sends a batch automatically once a day — no need to keep this open. Works even if you sign out or close the browser.</p>
+    <label for="schedSize">Emails per day (the cap)</label>
+    <input type="number" id="schedSize" min="1" max="500" value="50">
+    <label for="schedSlice" style="margin-top:12px">Emails per check-in</label>
+    <input type="number" id="schedSlice" min="1" max="500" value="10">
+    <p style="margin:6px 0 0;font-size:12px">Each time something pings this campaign — Vercel's own once-a-day check, or an outside pinger you add for more frequent check-ins — it sends this many, and never more than the daily cap.</p>
+    <div class="row"><button class="btn big" type="button" id="schedCancelBtn">Cancel</button><button class="btn go big" type="button" id="schedStartBtn">Start schedule</button></div>
+  </div>
+</div>
 <div id="toasts" aria-live="polite"></div>
 <div id="login" hidden>
   <div class="lcard" id="lcard">
@@ -459,7 +497,7 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
         <div class="dots" id="dots"></div>
         <div class="dotshint" id="dotsHint"></div>
       </div>
-      <div class="fld stag" style="--i:2"><label for="lgName">Your name <span style="font-weight:400;color:var(--faint)">(shown to recipients)</span></label><input id="lgName" autocomplete="name" placeholder="Michael Okpegboro"></div>
+      <div class="fld stag" style="--i:2"><label for="lgName">Your name <span style="font-weight:400;color:var(--faint)">(shown to recipients)</span></label><input id="lgName" autocomplete="name" placeholder="Your full name"></div>
       <button class="btn go big wide stag" style="--i:3" type="submit" id="btnLogin"><span>Connect Gmail</span></button>
       <div class="err" id="loginErr" hidden></div>
     </form>
@@ -517,14 +555,25 @@ const Account = {
   clear() { memAccount = null; try { localStorage.removeItem(ACCOUNT_KEY); } catch (e) {} }
 };
 const demoOn = () => { try { return demoMem || sessionStorage.getItem('gcm.demo') === '1'; } catch (e) { return demoMem; } };
-async function post(url, body) {
+async function post(url, body, method) {
   let res;
-  try { res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'gcm' }, body: JSON.stringify(body) }); }
+  const opts = { method: method || 'POST', headers: { 'X-Requested-With': 'gcm' } };
+  if (method !== 'GET') { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body); }
+  try { res = await fetch(url, opts); }
   catch (e) { throw new Error('Could not reach the server. Check your connection.'); }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) { const err = new Error(data.error || ('Server error ' + res.status)); err.status = res.status; throw err; }
   return data;
 }
+const SCHED_KEY = 'gcm.schedule.v1';
+const scheduleApi = {
+  start: payload => post('/api/schedule-start', payload),
+  status: id => post('/api/schedule-status?id=' + encodeURIComponent(id), null, 'GET'),
+  cancel: id => post('/api/schedule-cancel', { id })
+};
+function savedScheduleId() { try { return JSON.parse(localStorage.getItem(SCHED_KEY) || 'null'); } catch (e) { return null; } }
+function saveScheduleId(id) { try { id ? localStorage.setItem(SCHED_KEY, JSON.stringify(id)) : localStorage.removeItem(SCHED_KEY); } catch (e) {} }
+
 const T = {
   get delay() { return demoOn() ? 120 : 500; },
   async info() {
@@ -874,7 +923,8 @@ function renderBar() {
   else { main = 'Ready to send to ' + plural(n, 'recipient'); if (over) { note = 'Gmail allows ' + q + ' more today. The rest stay ready for tomorrow.'; noteCls = 'warn'; } }
   if (S.summary) { note = S.summary + (note ? ' ' + note : ''); }
   const enabled = !(b.length || !n), pulse = enabled && !S.wasReady; S.wasReady = enabled;
-  el.innerHTML = '<div class="sendmsg"><div class="main">' + (allDone ? CHECK + '<span>' + esc(main) + '</span>' : esc(main)) + '</div>' + (note ? '<div class="note ' + noteCls + '">' + esc(note) + '</div>' : '') + '</div>' +
+  const canSchedule = enabled && !failedOnly && !savedScheduleId() && S.info && S.info.mode === 'live';
+  el.innerHTML = '<div class="sendmsg"><div class="main">' + (allDone ? CHECK + '<span>' + esc(main) + '</span>' : esc(main)) + '</div>' + (note ? '<div class="note ' + noteCls + '">' + esc(note) + '</div>' : (canSchedule ? '<div class="note"><button type="button" id="btnScheduleOpen" style="border:0;background:none;color:var(--blue);font:inherit;font-weight:600;padding:0;cursor:pointer">Schedule daily sending instead</button></div>' : '')) + '</div>' +
     '<div class="sendbtns"><button class="btn big" id="btnTest" type="button"' + (can ? '' : ' disabled') + '>Send test to me</button>' +
     '<button class="btn go big' + (pulse ? ' ready' : '') + '" id="btnSend" type="button"' + (enabled ? '' : ' disabled') + '>' + (failedOnly ? 'Retry ' + n + ' failed' : (n ? 'Send to ' + n : 'Send')) + '</button></div>';
 }
@@ -1042,6 +1092,55 @@ function authFailed() {
   showLogin('Gmail rejected the saved sign-in. Enter your App Password again to continue.', a);
 }
 
+/* ---------- schedule status bar ---------- */
+let schedPollTimer = 0;
+function renderSchedule(info) {
+  const bar = $('#schedBar');
+  if (!info || info.status !== 'active') { bar.hidden = true; return; }
+  bar.hidden = false;
+  const pct = info.total ? Math.round(info.sent / info.total * 100) : 0;
+  const capHit = info.sentToday >= info.batchSize;
+  const note = capHit ? "today's cap of " + info.batchSize + " reached — resumes after midnight UTC"
+    : 'sends ' + info.perCall + ' per check-in, up to ' + info.batchSize + '/day (' + info.sentToday + ' so far today)';
+  $('#schedin').innerHTML =
+    '<span class="sdot"></span><span><b>Scheduled</b> — ' + info.sent + ' of ' + info.total + ' sent' + (info.failed ? ', ' + info.failed + ' failed' : '') + '</span>' +
+    '<span class="sbar"><i style="width:' + pct + '%"></i></span>' +
+    '<span class="snote">' + note + '</span>' +
+    '<button type="button" id="schedCancelInline">Cancel</button>';
+}
+async function refreshSchedule() {
+  const id = savedScheduleId();
+  if (!id) { renderSchedule(null); return; }
+  try { renderSchedule(await scheduleApi.status(id)); }
+  catch (e) { saveScheduleId(null); renderSchedule(null); }
+}
+async function cancelSchedule() {
+  const id = savedScheduleId();
+  if (!id) return;
+  try { await scheduleApi.cancel(id); } catch (e) {}
+  saveScheduleId(null); renderSchedule(null); renderBar();
+  toast('Schedule canceled.');
+}
+$('#schedBar').addEventListener('click', e => { if (e.target.id === 'schedCancelInline') cancelSchedule(); });
+$('#schedPop').addEventListener('click', e => { if (e.target === e.currentTarget) $('#schedPop').hidden = true; });
+$('#schedCancelBtn').onclick = () => { $('#schedPop').hidden = true; };
+$('#schedStartBtn').onclick = async () => {
+  const size = Math.max(1, Math.min(500, +$('#schedSize').value || 50));
+  const a = Account.get();
+  if (!a) { $('#schedPop').hidden = true; return showLogin(); }
+  const btn = $('#schedStartBtn'); btn.disabled = true; btn.textContent = 'Starting…';
+  try {
+    const rec = await scheduleApi.start({
+      account: a, subject: $('#subject').value.trim(), body: bodyVal().trim(), isHtml: S.bodyMode === 'html',
+      batchSize: size, perCall: Math.max(1, Math.min(500, +$('#schedSlice').value || 10)), columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol,
+      recipients: pending().map(r => ({ email: r.email, data: r.data }))
+    });
+    saveScheduleId(rec.id); renderSchedule(rec); $('#schedPop').hidden = true; renderBar();
+    toast('Scheduled — ' + rec.total + ' emails, ' + size + ' a day.', 'good');
+  } catch (e) { toast(errMsg(e), 'bad'); }
+  btn.disabled = false; btn.textContent = 'Start schedule';
+};
+
 /* ---------- events ---------- */
 $('#btnChoose').onclick = () => $('#file').click();
 $('#file').onchange = e => { loadFile(e.target.files[0]); e.target.value = ''; };
@@ -1122,6 +1221,7 @@ $('#sendin').addEventListener('click', e => {
   else if (id === 'btnCancel') { S.confirming = false; renderBar(); }
   else if (id === 'btnConfirm') runSend();
   else if (id === 'btnStop') { S.stop = true; renderBar(); }
+  else if (id === 'btnScheduleOpen') { const n = Math.min(500, pending().length || 50); $('#schedSize').value = n; $('#schedSlice').value = Math.max(1, Math.min(n, Math.ceil(n / 5))); $('#schedPop').hidden = false; }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.confirming) { S.confirming = false; renderBar(); } });
 window.addEventListener('beforeunload', e => { if (S.sending) { e.preventDefault(); e.returnValue = ''; } });
@@ -1227,6 +1327,8 @@ window.__gcm = S; // handy when poking around in the console
 restore();
 renderNow();
 boot();
+refreshSchedule();
+setInterval(refreshSchedule, 60000);
 })();
 </script>
 </body>
