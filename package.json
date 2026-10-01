@@ -4,8 +4,5 @@
   "private": true,
   "description": "Personalised one-by-one Gmail sending from a CSV. Single user, hosted on Vercel.",
   "engines": { "node": ">=18" },
-  "dependencies": {
-    "nodemailer": "^6.9.16",
-    "@supabase/supabase-js": "^2.45.0"
-  }
+  "dependencies": { "nodemailer": "^6.9.16", "@supabase/supabase-js": "^2.45.0" }
 }
