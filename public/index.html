@@ -1413,13 +1413,21 @@ function applyDetail(rows, d, getEmail) {
 }
 
 // When is the next time this schedule is allowed to send (ignoring the wait between groups)?
-function nextOpenTime(s) {
-  let t = Math.max(Date.now(), s.startAt ? new Date(s.startAt).getTime() : 0);
-  const today = localParts(new Date(), s.tz).date, capHit = s.sentToday >= s.dailyLimit;
-  for (let i = 0; i < 8 * 96; i++, t += 15 * 60000) {
+// Finds the first open slot, then walks back to the exact minute the window opens, so the answer
+// is the same every time you look (e.g. always 8:00 AM) instead of drifting with the clock.
+function nextOpenTime(s, nowMs) {
+  const now = nowMs == null ? Date.now() : nowMs;
+  const base = Math.max(now, s.startAt ? new Date(s.startAt).getTime() : 0);
+  const today = localParts(new Date(now), s.tz).date, capHit = s.sentToday >= s.dailyLimit;
+  const open = t => {
     const p = localParts(new Date(t), s.tz);
-    if (capHit && p.date === today) continue;
-    if (s.days.includes(p.dow) && p.minutes >= s.windowStart && p.minutes < s.windowEnd) return t;
+    if (capHit && p.date === today) return false;
+    return s.days.includes(p.dow) && p.minutes >= s.windowStart && p.minutes < s.windowEnd;
+  };
+  if (open(base)) return base;
+  for (let i = 1, t = base; i <= 8 * 96; i++) {
+    t += 15 * 60000;
+    if (open(t)) { let r = t; while (r - 60000 > base && open(r - 60000)) r -= 60000; return r; }
   }
   return null;
 }
