@@ -30,11 +30,10 @@ button{cursor:pointer}
 .pill{display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:999px;background:var(--desk);font-size:12.5px;color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint)}
 .pill.live{background:var(--go-soft);color:var(--go)} .pill.live::before{background:var(--go)}
-.pill.demo{background:var(--warn-soft);color:var(--warn)} .pill.demo::before{background:#d98a00}
 .pill.quota::before{display:none}
 
 /* layout */
-.app{max-width:1280px;margin:0 auto;padding:22px 24px 150px}
+.app{max-width:1280px;margin:0 auto;padding:22px 24px 200px}
 .grid{display:grid;grid-template-columns:minmax(340px,430px) minmax(0,1fr);gap:22px;align-items:start}
 .col{display:grid;gap:22px;min-width:0}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.app{padding:16px 14px 170px}.top{padding:10px 14px;flex-wrap:wrap}.pills{justify-content:flex-start;max-width:100%}.tablewrap{max-height:320px}}
@@ -365,6 +364,91 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
 .schedcard .row{display:flex;gap:10px;margin-top:18px}
 .schedcard .row .btn{flex:1}
 
+/* ===== v5: history, status, advanced scheduling ===== */
+.st.queued{background:#ecebfb;color:#4a46b5}
+.st.queued::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:1px;animation:beat2 1.6s ease-in-out infinite}
+@keyframes beat2{50%{opacity:.3;transform:scale(.65)}}
+.when{display:block;color:var(--faint);font-size:12px;margin-top:2px}
+.acts{display:flex;gap:2px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.hint a,.hint button.lnk{color:var(--blue)}
+
+/* shared popup */
+.schedpop{animation:fadeIn .2s}
+.schedcard.wide{max-width:540px;max-height:92vh;overflow:auto;overscroll-behavior:contain}
+.schedcard h3{font-size:17px}
+.schedcard .row.sticky{position:sticky;bottom:-22px;background:linear-gradient(rgba(255,255,255,0),#fff 22%);padding:16px 0 0;margin-top:14px}
+
+/* schedule form */
+.sd-sec{margin-top:18px;animation:fadeUp .45s var(--ease) both;animation-delay:calc(var(--i,0) * 70ms)}
+.sd-sec h4{margin:0 0 2px;font-size:13.5px}
+.sd-sec .help2{margin:0 0 8px;color:var(--muted);font-size:12.5px}
+.schedcard .sd-inline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--ink)}
+.schedcard .sd-inline input,.schedcard .sd-inline select{width:auto;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;font-size:14.5px;background:#fff;transition:border-color .15s,box-shadow .2s}
+.schedcard .sd-inline input[type=number]{width:84px}
+.schedcard .sd-inline input:focus,.schedcard .sd-inline select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(31,95,191,.14)}
+.days{display:flex;gap:6px;flex-wrap:wrap}
+.dchip{border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:6px 11px;font-weight:600;font-size:13px;color:var(--muted);transition:background .15s,color .15s,border-color .15s,transform .12s var(--ease)}
+.dchip:active{transform:scale(.92)}
+.dchip.on{background:var(--blue);border-color:var(--blue);color:#fff;animation:pop .3s var(--ease)}
+.quick{display:flex;gap:6px;margin-top:8px}
+.quick button{border:0;background:none;color:var(--blue);font-size:12.5px;font-weight:600;padding:2px 0;text-decoration:underline;text-underline-offset:3px}
+.schedcard .startopt{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.schedcard .startopt label{display:flex;align-items:center;gap:7px;margin:0;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer}
+.schedcard .startopt input{width:auto}
+.schedcard input[type=radio]{accent-color:var(--blue);width:16px;height:16px}
+#sdStartAt{max-width:240px}
+.sd-sum{margin-top:20px;padding:13px 15px;border-radius:12px;background:var(--go-soft);color:#0b5139;font-size:13.5px;line-height:1.55;transition:background .25s,color .25s}
+.sd-sum .big{display:block;font-size:21px;line-height:1.25;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-bottom:3px}
+.sd-sum.warn{background:var(--warn-soft);color:var(--warn)}
+.sd-sum.bad{background:var(--bad-soft);color:var(--bad)}
+.sd-sum.flash{animation:sumPulse .6s ease-out}
+@keyframes sumPulse{from{box-shadow:0 0 0 0 rgba(19,121,91,.45)}to{box-shadow:0 0 0 14px rgba(19,121,91,0)}}
+.sd-sum .tip{display:block;margin-top:6px;font-size:12.5px}
+
+/* history */
+.hcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;background:#fff;animation:fadeUp .45s var(--ease) both;animation-delay:calc(var(--i,0) * 55ms);transition:box-shadow .2s,transform .15s var(--ease),border-color .2s}
+.hcard:hover{box-shadow:0 12px 26px -18px rgba(22,32,46,.55);transform:translateY(-1px)}
+.hcard.cur{border-color:var(--blue);background:#f6f9ff}
+.hcard .t{font-weight:650;word-break:break-word}
+.hcard .m{color:var(--muted);font-size:12.5px;margin-top:1px}
+.hbar{display:flex;height:6px;border-radius:99px;background:var(--line-soft);overflow:hidden;margin:9px 0 6px}
+.hbar i{display:block;height:100%;width:0;transition:width .7s var(--ease)}
+.hbar .bs{background:var(--go)} .hbar .bf{background:var(--bad)} .hbar .bq{background:#8b87e6}
+.hnums{display:flex;gap:4px 14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.hnums b{color:var(--ink);font-variant-numeric:tabular-nums}
+.hcard .hact{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.hcard .hact .btn{padding:6px 11px;font-size:12.5px}
+.badge{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11.5px;font-weight:600;background:var(--desk);color:var(--muted);margin-left:6px;vertical-align:1px}
+.badge.live{background:var(--go-soft);color:var(--go)}
+.badge.paused{background:var(--warn-soft);color:var(--warn)}
+.badge.live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--go);margin-right:5px;animation:beat2 1.6s ease-in-out infinite}
+.hfoot{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line-soft);flex-wrap:wrap}
+.hempty{text-align:center;color:var(--muted);padding:26px 8px}
+
+/* schedule bar (upgraded) */
+#schedBar{animation:schedIn .45s var(--ease)}
+@keyframes schedIn{from{transform:translateY(100%);opacity:0}}
+.schedin{flex-wrap:wrap;row-gap:6px}
+.schedin .sbar{position:relative}
+.schedin .sbar i{background-image:repeating-linear-gradient(-45deg,rgba(255,255,255,.28) 0 8px,transparent 8px 16px);background-size:22px 22px;animation:stripes .9s linear infinite}
+#schedBar.paused .sdot{background:#ffc857;animation:none}
+#schedBar.paused .sbar i{animation:none;background-image:none;background-color:#ffc857}
+#schedBar.finished{background:#0f5c45}
+#schedBar.finished .sdot{animation:none}
+.schedin .snote.warn{color:#ffd27a;white-space:normal}
+.schedwarn{max-width:1280px;margin:0 auto;padding:0 24px 9px;color:#ffd27a;font-size:12.5px}
+@media(max-width:900px){.schedwarn{padding:0 14px 8px}}
+.app{padding-bottom:200px}
+
+.sdfoot{position:sticky;bottom:-22px;margin:16px -22px -22px;padding:12px 22px 22px;background:#fff;border-top:1px solid var(--line-soft);z-index:2}
+.sdfoot .sd-sum{margin-top:0}
+.sdfoot .row{margin-top:12px}
+/* bars stack on top of each other at any height */
+#schedBar{bottom:var(--sendH,66px)}
+.app{padding-bottom:calc(var(--sendH,66px) + var(--schedH,0px) + 36px)}
+#toasts{bottom:calc(var(--sendH,66px) + var(--schedH,0px) + 20px)}
+@media(max-width:900px){.app{padding-bottom:calc(var(--sendH,66px) + var(--schedH,0px) + 28px)}}
+
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 </style>
 </head>
@@ -388,19 +472,19 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
   <!-- recipients -->
   <section class="panel" id="listPanel" aria-label="Recipients">
     <div id="importView">
-      <div class="panel-head"><h2>Recipients</h2></div>
+      <div class="panel-head"><h2>Recipients</h2><button class="btn ghost" id="btnHistory1" type="button">History</button></div>
       <div class="panel-body">
         <div class="drop" id="dropZone">
           <svg class="up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
-          <p>Drop a CSV anywhere on this page, or paste your list below.</p>
+          <p>Drop a CSV or Excel file anywhere on this page, or paste your list below.</p>
           <div class="row">
             <button class="btn primary" id="btnChoose" type="button">Choose file</button>
             <button class="btn" id="btnSample" type="button">Try sample data</button>
           </div>
-          <input type="file" id="file" accept=".csv,.tsv,.txt,text/csv,text/plain" hidden>
+          <input type="file" id="file" accept=".csv,.tsv,.txt,.xlsx,text/csv,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
         </div>
         <textarea id="paste" spellcheck="false" placeholder="Name,Email,Company&#10;Ada Obi,ada@example.com,Obi Ltd"></textarea>
-        <div class="hint">Loads as soon as you paste. Commas, semicolons and tabs are detected. A plain list of emails works too.</div>
+        <div class="hint">Loads as soon as you paste. Commas, semicolons and tabs are detected. A plain list of emails works too. For Excel files, the first sheet is used.</div>
         <div class="err" id="importErr" hidden></div>
       </div>
     </div>
@@ -408,7 +492,7 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
     <div id="tableView" hidden>
       <div class="panel-head">
         <div><h2>Recipients</h2><div class="sub" id="srcLabel"></div></div>
-        <button class="btn ghost" id="btnReplace" type="button">Replace list</button>
+        <div class="acts"><button class="btn ghost" id="btnHistory2" type="button">History</button><button class="btn ghost" id="btnReport" type="button">Download report</button><button class="btn ghost" id="btnReplace" type="button">Replace list</button></div>
       </div>
       <div class="panel-body">
         <div class="filters" id="filters"></div>
@@ -466,15 +550,53 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
 <footer class="sendbar"><div class="sendin" id="sendin"></div></footer>
 <div id="schedBar" hidden><div class="schedin" id="schedin"></div></div>
 <div class="schedpop" id="schedPop" hidden>
-  <div class="schedcard">
-    <h3>Schedule daily sending</h3>
-    <p>Sends a batch automatically once a day — no need to keep this open. Works even if you sign out or close the browser.</p>
-    <label for="schedSize">Emails per day (the cap)</label>
-    <input type="number" id="schedSize" min="1" max="500" value="50">
-    <label for="schedSlice" style="margin-top:12px">Emails per check-in</label>
-    <input type="number" id="schedSlice" min="1" max="500" value="10">
-    <p style="margin:6px 0 0;font-size:12px">Each time something pings this campaign — Vercel's own once-a-day check, or an outside pinger you add for more frequent check-ins — it sends this many, and never more than the daily cap.</p>
-    <div class="row"><button class="btn big" type="button" id="schedCancelBtn">Cancel</button><button class="btn go big" type="button" id="schedStartBtn">Start schedule</button></div>
+  <div class="schedcard wide" role="dialog" aria-modal="true" aria-labelledby="sdTitle">
+    <h3 id="sdTitle">Schedule your emails</h3>
+    <p>Pick how fast and when they go out. It runs by itself, even if you close this page.</p>
+
+    <div class="sd-sec" style="--i:0">
+      <h4>1. Daily limit</h4>
+      <div class="help2">The most emails that will go out in one day. Gmail allows about 500 a day on a free account.</div>
+      <div class="sd-inline"><input type="number" id="sdDaily" min="1" max="500" inputmode="numeric"> <span>emails a day at most</span></div>
+    </div>
+
+    <div class="sd-sec" style="--i:1">
+      <h4>2. Spread them out</h4>
+      <div class="help2">Small groups look more natural than one big burst.</div>
+      <div class="sd-inline">Send <input type="number" id="sdPer" min="1" max="20" inputmode="numeric"> emails every <select id="sdEvery"></select></div>
+    </div>
+
+    <div class="sd-sec" style="--i:2">
+      <h4>3. Only send between</h4>
+      <div class="help2" id="sdTz">Outside these hours nothing is sent.</div>
+      <div class="sd-inline"><input type="time" id="sdFrom"> <span>and</span> <input type="time" id="sdTo"></div>
+    </div>
+
+    <div class="sd-sec" style="--i:3">
+      <h4>4. On these days</h4>
+      <div class="days" id="sdDays"></div>
+      <div class="quick"><button type="button" id="sdAll">Every day</button><button type="button" id="sdWeek">Weekdays only</button></div>
+    </div>
+
+    <div class="sd-sec" style="--i:4">
+      <h4>5. Start</h4>
+      <div class="startopt">
+        <label><input type="radio" name="sdStart" id="sdStartNow" checked> Right away</label>
+        <label><input type="radio" name="sdStart" id="sdStartLater"> Pick a time</label>
+      </div>
+      <input type="datetime-local" id="sdStartAt" hidden>
+    </div>
+
+    <div class="sdfoot"><div class="sd-sum" id="sdSummary" aria-live="polite"></div>
+    <div class="row"><button class="btn big" type="button" id="schedCancelBtn">Close</button><button class="btn go big" type="button" id="schedStartBtn">Start schedule</button></div></div>
+  </div>
+</div>
+<div class="schedpop" id="histPop" hidden>
+  <div class="schedcard wide" role="dialog" aria-modal="true" aria-labelledby="hTitle">
+    <h3 id="hTitle">History</h3>
+    <p>Every list you load is saved on this device, so replacing a list never loses it. Open one to see who got the email and when.</p>
+    <div id="histList"></div>
+    <div class="hfoot"><span class="sub" id="histStore"></span><span style="flex:1"></span><button class="btn ghost" id="histClear" type="button">Clear all</button><button class="btn" id="histClose" type="button">Close</button></div>
   </div>
 </div>
 <div id="toasts" aria-live="polite"></div>
@@ -513,11 +635,11 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
         </ol>
       </div>
     </details>
-    <button class="linkbtn stag" style="--i:5" type="button" id="btnDemo">Look around in demo mode (nothing is sent)</button>
   </div>
 </div>
-<div id="dropOverlay" hidden><div>Drop a CSV to load recipients</div></div>
+<div id="dropOverlay" hidden><div>Drop a CSV or Excel file to load recipients</div></div>
 
+<script src="/vendor/read-excel-file.min.js"></script>
 <script>
 (() => {
 'use strict';
@@ -545,16 +667,51 @@ function tickTo(el, from, to) {
     if (k < 1) requestAnimationFrame(step);
   })(t0);
 }
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const fmtWhen = iso => { try { const d = new Date(iso), t = new Date(), same = d.toDateString() === t.toDateString(); return (same ? 'Today' : d.toLocaleDateString([], { day: 'numeric', month: 'short' })) + ', ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } };
+const fmtDate = iso => { try { return new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return ''; } };
+function ago(iso) {
+  const s = Math.max(0, (Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.round(s / 60) + ' min ago';
+  if (s < 86400) return Math.round(s / 3600) + ' h ago';
+  return Math.round(s / 86400) + ' d ago';
+}
+const TZ = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Lagos'; } catch (e) { return 'Africa/Lagos'; } })();
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+function localParts(date, tz) {
+  const f = new Intl.DateTimeFormat('en-GB', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
+  const o = {}; for (const p of f.formatToParts(date)) o[p.type] = p.value;
+  return { date: o.year + '-' + o.month + '-' + o.day, minutes: (+o.hour) * 60 + (+o.minute), dow: DAY_NAMES.indexOf(String(o.weekday).slice(0, 3)) };
+}
+const hm = m => { m = ((m % 1440) + 1440) % 1440; const h = Math.floor(m / 60), mm = m % 60; return ((h % 12) || 12) + ':' + String(mm).padStart(2, '0') + ' ' + (h < 12 ? 'AM' : 'PM'); };
+const toMin = v => { const p = String(v || '').split(':').map(Number); return isNaN(p[0]) ? NaN : (p[0] || 0) * 60 + (p[1] || 0); };
+const toHHMM = m => String(Math.floor(m / 60) % 24).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+const EVERY_OPTS = [[1, '1 minute'], [5, '5 minutes'], [10, '10 minutes'], [15, '15 minutes'], [30, '30 minutes'], [60, '1 hour'], [120, '2 hours'], [240, '4 hours']];
+const everyLabel = m => (EVERY_OPTS.find(o => o[0] === m) || [m, m + ' minutes'])[1];
+function daysLabel(days) {
+  const d = [...days].sort((a, b) => a - b).join();
+  if (d === '0,1,2,3,4,5,6') return 'every day';
+  if (d === '1,2,3,4,5') return 'Monday to Friday';
+  if (d === '0,6') return 'weekends';
+  return [...days].sort((a, b) => a - b).map(x => DAY_NAMES[x]).join(', ');
+}
+const clampInt = (v, lo, hi, d) => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : (d == null ? lo : d); };
+function csvCell(v) { v = String(v == null ? '' : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function download(name, text, type) {
+  const url = URL.createObjectURL(new Blob(['\uFEFF' + text], { type: type || 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url); }, 500);
+}
 
 /* ---------- account (kept in this browser until you sign out) + transport ---------- */
 const ACCOUNT_KEY = 'gcm.account.v4';
-let memAccount = null, demoMem = false;
+let memAccount = null;
 const Account = {
   get() { try { return JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null') || memAccount; } catch (e) { return memAccount; } },
   set(a) { memAccount = a; try { localStorage.setItem(ACCOUNT_KEY, JSON.stringify(a)); } catch (e) {} },
   clear() { memAccount = null; try { localStorage.removeItem(ACCOUNT_KEY); } catch (e) {} }
 };
-const demoOn = () => { try { return demoMem || sessionStorage.getItem('gcm.demo') === '1'; } catch (e) { return demoMem; } };
 async function post(url, body, method) {
   let res;
   const opts = { method: method || 'POST', headers: { 'X-Requested-With': 'gcm' } };
@@ -565,30 +722,21 @@ async function post(url, body, method) {
   if (!res.ok) { const err = new Error(data.error || ('Server error ' + res.status)); err.status = res.status; throw err; }
   return data;
 }
-const SCHED_KEY = 'gcm.schedule.v1';
 const scheduleApi = {
   start: payload => post('/api/schedule-start', payload),
-  status: id => post('/api/schedule-status?id=' + encodeURIComponent(id), null, 'GET'),
-  cancel: id => post('/api/schedule-cancel', { id })
+  status: (id, detail) => post('/api/schedule-status?id=' + encodeURIComponent(id) + (detail ? '&detail=1' : ''), null, 'GET'),
+  cancel: id => post('/api/schedule-cancel', { id }),
+  pause: (id, action) => post('/api/schedule-pause', { id, action })
 };
-function savedScheduleId() { try { return JSON.parse(localStorage.getItem(SCHED_KEY) || 'null'); } catch (e) { return null; } }
-function saveScheduleId(id) { try { id ? localStorage.setItem(SCHED_KEY, JSON.stringify(id)) : localStorage.removeItem(SCHED_KEY); } catch (e) {} }
 
 const T = {
-  get delay() { return demoOn() ? 120 : 500; },
+  delay: 500,
   async info() {
-    if (demoOn()) return { sender: 'demo@example.com', name: 'Your Name', mode: 'demo', quota: null };
     const a = Account.get();
     if (!a) { const e = new Error('Please sign in.'); e.status = 401; throw e; }
     return { sender: a.email, name: a.name || a.email.split('@')[0], mode: 'live', quota: null };
   },
   async send(p) {
-    if (demoOn()) {
-      // Demo: nothing is sent. Addresses containing "+fail" fail, so the retry flow can be tried.
-      await sleep(160);
-      if (/\+fail/i.test(p.recipient)) throw new Error('Simulated failure');
-      return { success: true, message: 'Sent to ' + p.recipient };
-    }
     const a = Account.get();
     if (!a) { const e = new Error('Please sign in.'); e.status = 401; throw e; }
     return post('/api/send', Object.assign({ account: a }, p));
@@ -598,7 +746,7 @@ const T = {
 
 /* ---------- state ---------- */
 const S = {
-  columns: [], emailCol: null, nameCol: null, rows: [], source: '',
+  columns: [], emailCol: null, nameCol: null, rows: [], source: '', listId: null, listCreatedAt: null, scheduleId: null, sched: null, schedDismissed: null,
   filter: 'all', query: '', previewId: null,
   info: null, sending: false, stop: false, confirming: false,
   testSent: false, summary: '', progress: { done: 0, total: 0, current: '' }, lastField: 'body',
@@ -672,7 +820,10 @@ function pickNameCol(columns, emailCol) {
 function importText(text, source) {
   text = String(text || '').replace(/^\uFEFF/, '');
   if (!text.trim()) throw new Error('Nothing to import.');
-  const grid = parseDelimited(text, detectDelimiter(text));
+  importGrid(parseDelimited(text, detectDelimiter(text)), source);
+}
+function importGrid(grid, source) {
+  grid = (grid || []).filter(r => r.some(v => String(v == null ? '' : v).trim() !== ''));
   if (!grid.length) throw new Error('Nothing to import.');
   const isEmail = v => EMAIL_RE.test(cleanEmail(v));
   const hasHeader = !grid[0].some(isEmail);
@@ -692,6 +843,7 @@ function importText(text, source) {
   if (!emailCol) throw new Error("Couldn't find a column of email addresses. Check that your list has one.");
   S.columns = columns; S.emailCol = emailCol; S.nameCol = pickNameCol(columns, emailCol);
   S.source = source || 'Pasted list';
+  S.listId = uid(); S.listCreatedAt = new Date().toISOString(); S.scheduleId = null; S.sched = null; S.schedDismissed = null;
   S.rows = body.map((r, i) => {
     const data = {}; columns.forEach((c, k) => data[c] = String(r[k] == null ? '' : r[k]).trim());
     return { id: i + 1, data, email: '', status: 'ready', selected: true, error: '' };
@@ -706,7 +858,7 @@ function classify() {
   S.rows.forEach(r => {
     r.email = cleanEmail(r.data[S.emailCol] || '');
     const valid = EMAIL_RE.test(r.email), key = r.email.toLowerCase();
-    if (r.status === 'sent' || r.status === 'failed' || r.status === 'sending') { if (valid) seen.add(key); return; }
+    if (r.status === 'sent' || r.status === 'failed' || r.status === 'sending' || r.status === 'queued') { if (valid) seen.add(key); return; }
     if (!valid) { r.status = 'invalid'; r.selected = false; }
     else if (seen.has(key)) { r.status = 'duplicate'; r.selected = false; }
     else { r.status = 'ready'; r.selected = true; seen.add(key); }
@@ -763,7 +915,7 @@ let raf = 0;
 function render() { cancelAnimationFrame(raf); raf = requestAnimationFrame(renderNow); }
 function renderNow() { renderList(); renderCompose(); renderPreview(); renderBar(); save(); }
 
-const STATUS_LABEL = { ready:'Ready', sent:'Sent', failed:'Failed', invalid:'Invalid email', duplicate:'Duplicate', sending:'Sending…' };
+const STATUS_LABEL = { ready:'Ready', queued:'Queued', sent:'Sent', failed:'Failed', invalid:'Invalid email', duplicate:'Duplicate', sending:'Sending…' };
 function visibleRows() {
   const q = S.query.trim().toLowerCase();
   return S.rows.filter(r => {
@@ -777,7 +929,7 @@ function renderList() {
   if (!has) return;
   const n = st => S.rows.filter(r => r.status === st).length;
   const skipped = n('invalid') + n('duplicate');
-  const defs = [['all','All',S.rows.length],['ready','Ready',n('ready')],['sent','Sent',n('sent')],['failed','Failed',n('failed')],['skipped','Skipped',skipped]];
+  const defs = [['all','All',S.rows.length],['ready','Ready',n('ready')],['queued','Queued',n('queued')],['sent','Sent',n('sent')],['failed','Failed',n('failed')],['skipped','Skipped',skipped]];
   $('#filters').innerHTML = defs.map(([k,l,c]) => (c || k === 'all' || k === 'ready')
     ? '<button type="button" class="f' + (S.filter === k ? ' on' : '') + '" data-f="' + k + '">' + l + '<b data-k="' + k + '" data-to="' + c + '">' + (S.prev[k] == null ? c : S.prev[k]) + '</b></button>' : '').join('');
   $('#filters').querySelectorAll('b[data-k]').forEach(b => { const to = +b.dataset.to, from = S.prev[b.dataset.k]; if (from != null && from !== to) tickTo(b, from, to); S.prev[b.dataset.k] = to; });
@@ -797,7 +949,7 @@ function renderList() {
     return '<tr data-id="' + r.id + '"' + (cls ? ' class="' + cls + '"' : '') + (stagger && i < 14 ? ' style="--i:' + i + '"' : '') + '>' +
       '<td class="chk"><input type="checkbox" ' + (r.selected ? 'checked ' : '') + (selectable(r) && !S.sending ? '' : 'disabled ') + 'aria-label="Select ' + esc(r.email) + '"></td>' +
       '<td>' + (name ? '<div class="nm">' + esc(name) + '</div>' : '') + '<div class="em">' + esc(r.email || r.data[S.emailCol] || '–') + '</div></td>' +
-      '<td><span class="st ' + r.status + '">' + STATUS_LABEL[r.status] + '</span>' + (r.error ? '<span class="errline">' + esc(r.error) + '</span>' : '') + '</td></tr>';
+      '<td><span class="st ' + r.status + '">' + STATUS_LABEL[r.status] + '</span>' + (r.status === 'sent' && r.sentAt ? '<span class="when">' + esc(fmtWhen(r.sentAt)) + '</span>' : '') + (r.error ? '<span class="errline">' + esc(r.error) + '</span>' : '') + '</td></tr>';
   }).join('') || '<tr><td colspan="3" class="sub" style="text-align:center;padding:18px">No recipients match.</td></tr>';
   shown.forEach(r => { r.flash = null; });
   const more = $('#moreNote');
@@ -872,7 +1024,7 @@ function blockers() {
   if (!$('#subject').value.trim()) b.push('Add a subject');
   if (!bodyVal().trim()) b.push('Write your message');
   if (!S.rows.length) b.unshift('Add recipients');
-  else if (!pending().length) b.push('Select at least one recipient');
+  else if (!pending().length) b.push(S.rows.some(r => r.status === 'queued') ? 'Everything left is scheduled' : 'Select at least one recipient');
   if (analyze().unknown.length) b.push('Fix unknown fields');
   if (S.info && S.info.quota === 0) b.push('Daily Gmail limit reached, try tomorrow');
   return b;
@@ -890,7 +1042,7 @@ function setBarState(el, key) {
   clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('swap'), 500);
 }
 function renderBar() {
-  const el = $('#sendin'), demo = S.info && S.info.mode !== 'live';
+  const el = $('#sendin');
   const can = !!$('#subject').value.trim() && !!bodyVal().trim() && !!S.info;
   if (S.sending) {
     setBarState(el, 'sending'); S.wasReady = false;
@@ -908,23 +1060,23 @@ function renderBar() {
   const n = sendCount(), b = blockers(), failedOnly = n > 0 && pending().every(r => r.status === 'failed');
   if (S.confirming && !b.length) {
     setBarState(el, 'confirm'); S.wasReady = false;
-    el.innerHTML = '<div class="sendmsg"><div class="main">Send ' + plural(n, 'email') + (demo ? '?' : ' from ' + esc(S.info.sender) + '?') + '</div><div class="note ' + (S.testSent || demo ? '' : 'warn') + '">' +
-      (demo ? 'Demo mode: nothing is actually sent.' : (S.testSent ? 'You sent yourself a test. This cannot be undone.' : 'You haven\'t sent yourself a test yet. This cannot be undone.')) + '</div></div>' +
+    el.innerHTML = '<div class="sendmsg"><div class="main">Send ' + plural(n, 'email') + ' from ' + esc(S.info.sender) + '?' + '</div><div class="note ' + (S.testSent ? '' : 'warn') + '">' +
+      (S.testSent ? 'You sent yourself a test. This cannot be undone.' : 'You haven\'t sent yourself a test yet. This cannot be undone.') + '</div></div>' +
       '<div class="sendbtns"><button class="btn big" id="btnCancel" type="button">Cancel</button><button class="btn go big" id="btnConfirm" type="button">Yes, send ' + n + '</button></div>';
     return;
   }
   S.confirming = false;
   const q = S.info && S.info.quota, over = q != null && pending().length > q;
   let main, note = '', noteCls = '';
-  const allDone = S.rows.length && !S.rows.some(selectable) && S.rows.some(r => r.status === 'sent');
+  const allDone = S.rows.length && !S.rows.some(selectable) && !S.rows.some(r => r.status === 'queued') && S.rows.some(r => r.status === 'sent');
   setBarState(el, allDone ? 'done' : 'idle');
   if (allDone) { main = 'All recipients sent'; }
   else if (b.length) { main = b[0]; note = b.length > 1 ? 'Also: ' + b.slice(1).map(x => x.charAt(0).toLowerCase() + x.slice(1)).join(', ') : ''; }
   else { main = 'Ready to send to ' + plural(n, 'recipient'); if (over) { note = 'Gmail allows ' + q + ' more today. The rest stay ready for tomorrow.'; noteCls = 'warn'; } }
   if (S.summary) { note = S.summary + (note ? ' ' + note : ''); }
   const enabled = !(b.length || !n), pulse = enabled && !S.wasReady; S.wasReady = enabled;
-  const canSchedule = enabled && !failedOnly && !savedScheduleId() && S.info && S.info.mode === 'live';
-  el.innerHTML = '<div class="sendmsg"><div class="main">' + (allDone ? CHECK + '<span>' + esc(main) + '</span>' : esc(main)) + '</div>' + (note ? '<div class="note ' + noteCls + '">' + esc(note) + '</div>' : (canSchedule ? '<div class="note"><button type="button" id="btnScheduleOpen" style="border:0;background:none;color:var(--blue);font:inherit;font-weight:600;padding:0;cursor:pointer">Schedule daily sending instead</button></div>' : '')) + '</div>' +
+  const canSchedule = enabled && !failedOnly && !S.scheduleId && !!S.info;
+  el.innerHTML = '<div class="sendmsg"><div class="main">' + (allDone ? CHECK + '<span>' + esc(main) + '</span>' : esc(main)) + '</div>' + (note ? '<div class="note ' + noteCls + '">' + esc(note) + '</div>' : (canSchedule ? '<div class="note"><button type="button" id="btnScheduleOpen" style="border:0;background:none;color:var(--blue);font:inherit;font-weight:600;padding:0;cursor:pointer">Schedule it instead</button></div>' : '')) + '</div>' +
     '<div class="sendbtns"><button class="btn big" id="btnTest" type="button"' + (can ? '' : ' disabled') + '>Send test to me</button>' +
     '<button class="btn go big' + (pulse ? ' ready' : '') + '" id="btnSend" type="button"' + (enabled ? '' : ' disabled') + '>' + (failedOnly ? 'Retry ' + n + ' failed' : (n ? 'Send to ' + n : 'Send')) + '</button></div>';
 }
@@ -934,10 +1086,9 @@ function renderQuota() {
   $('#pillQuota').hidden = true;
   so.hidden = !i;
   if (!i) { ps.className = 'pill'; ps.textContent = 'Signed out'; return; }
-  const live = i.mode === 'live';
-  ps.className = 'pill ' + (live ? 'live' : 'demo');
-  ps.textContent = live ? 'Sending as ' + i.sender : 'Demo mode: nothing is sent';
-  if (!so.dataset.armed) so.textContent = live ? 'Sign out' : 'Exit demo';
+  ps.className = 'pill live';
+  ps.textContent = 'Sending as ' + i.sender;
+  if (!so.dataset.armed) so.textContent = 'Sign out';
 }
 
 /* ---------- toasts + confetti ---------- */
@@ -961,60 +1112,202 @@ function confetti() {
   document.body.appendChild(box); setTimeout(() => box.remove(), 3500);
 }
 
-/* ---------- persistence (best effort) ---------- */
+/* ---------- saving + history (kept on this device) ---------- */
+const DRAFT_KEY = 'gcm.draft.v1', OLD_SESSION = 'gcm.session.v2', OLD_SCHED = 'gcm.schedule.v1', PREFS_KEY = 'gcm.sched.prefs.v1';
+const MAX_HISTORY = 100;
+let idbOk = !!window.indexedDB;
+const DB = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    let rq; try { rq = indexedDB.open('gcm-history', 1); } catch (e) { return rej(e); }
+    rq.onupgradeneeded = () => { if (!rq.result.objectStoreNames.contains('lists')) rq.result.createObjectStore('lists', { keyPath: 'id' }); };
+    rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error);
+  }));
+  const run = (mode, fn) => open().then(db => new Promise((res, rej) => {
+    const t = db.transaction('lists', mode); let r;
+    try { r = fn(t.objectStore('lists')); } catch (e) { return rej(e); }
+    t.oncomplete = () => res(r && r.result); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
+  }));
+  return { put: e => run('readwrite', s => s.put(e)), get: id => run('readonly', s => s.get(id)), all: () => run('readonly', s => s.getAll()), del: id => run('readwrite', s => s.delete(id)) };
+})();
+
+const ownerEmail = () => (S.info && S.info.sender) || ((Account.get() || {}).email) || '';
+function entryFromState() {
+  return {
+    id: S.listId, owner: ownerEmail(), name: S.source, source: S.source, createdAt: S.listCreatedAt, updatedAt: new Date().toISOString(),
+    columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol, scheduleId: S.scheduleId,
+    subject: $('#subject').value, body: $('#body').value, bodyHtml: $('#bodyHtml').value, bodyMode: S.bodyMode, testSent: S.testSent,
+    rows: S.rows.map(r => ({ id: r.id, data: r.data, email: r.email, status: r.status === 'sending' ? 'ready' : r.status, selected: r.selected, error: r.error, sentAt: r.sentAt || null }))
+  };
+}
 let saveTimer = 0;
-function save() {
+function save() { clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 400); }
+async function saveNow() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({
-        subject: $('#subject').value, body: $('#body').value, bodyHtml: $('#bodyHtml').value, bodyMode: S.bodyMode, columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol,
-        source: S.source, previewId: S.previewId, testSent: S.testSent,
-        rows: S.rows.map(r => ({ id: r.id, data: r.data, status: r.status === 'sending' ? 'ready' : r.status, selected: r.selected, error: r.error }))
-      }));
-    } catch (e) { /* storage unavailable: fine */ }
-  }, 300);
-}
-function restore() {
+  if (!ownerEmail()) return;
   try {
-    const d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-    if (!d) return false;
-    $('#subject').value = d.subject || ''; $('#body').value = d.body || ''; $('#bodyHtml').value = d.bodyHtml || ''; setBodyMode(d.bodyMode === 'html' ? 'html' : 'text', true);
-    if (d.rows && d.rows.length) {
-      S.columns = d.columns; S.emailCol = d.emailCol; S.nameCol = d.nameCol; S.source = d.source || 'Saved list';
-      S.rows = d.rows.map(r => Object.assign({ email: '' }, r)); S.previewId = d.previewId; S.testSent = !!d.testSent;
-      classify();
-      const sent = S.rows.filter(r => r.status === 'sent').length;
-      S.restoredMsg = 'Picked up where you left off' + (sent ? ' (' + sent + ' already sent)' : '') + '.';
-      return true;
-    }
-    return !!(d.subject || d.body);
-  } catch (e) { return false; }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ owner: ownerEmail(), listId: S.listId, subject: $('#subject').value, body: $('#body').value, bodyHtml: $('#bodyHtml').value, bodyMode: S.bodyMode, previewId: S.previewId, testSent: S.testSent }));
+  } catch (e) { /* storage unavailable: fine */ }
+  if (S.listId && S.rows.length && idbOk) { try { await DB.put(entryFromState()); } catch (e) { idbOk = false; } }
 }
-function clearSaved() { try { localStorage.removeItem(STORE_KEY); } catch (e) {} }
+function clearDraft() { clearTimeout(saveTimer); try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
+
+function loadEntry(e, withMessage) {
+  S.columns = e.columns || []; S.emailCol = e.emailCol || null; S.nameCol = e.nameCol || null; S.source = e.source || e.name || 'Saved list';
+  S.listId = e.id; S.listCreatedAt = e.createdAt || new Date().toISOString(); S.scheduleId = e.scheduleId || null; S.sched = null;
+  S.rows = (e.rows || []).map(r => Object.assign({ email: '' }, r)); classify();
+  S.previewId = (S.rows.find(selectable) || S.rows[0] || {}).id || null;
+  S.filter = 'all'; S.query = ''; S.confirming = false; S.summary = ''; S.prev = {}; S.animateRows = true;
+  if (withMessage) {
+    $('#subject').value = e.subject || ''; $('#body').value = e.body || ''; $('#bodyHtml').value = e.bodyHtml || '';
+    setBodyMode(e.bodyMode === 'html' ? 'html' : 'text', true); S.testSent = !!e.testSent;
+  }
+}
+// Lists saved by the older version lived in one local-storage slot. Move them into History once.
+async function migrateOld() {
+  try {
+    const raw = localStorage.getItem(OLD_SESSION); if (!raw) return;
+    localStorage.removeItem(OLD_SESSION);
+    const o = JSON.parse(raw), now = new Date().toISOString(); let oldSched = null;
+    try { oldSched = JSON.parse(localStorage.getItem(OLD_SCHED) || 'null'); localStorage.removeItem(OLD_SCHED); } catch (e) {}
+    if (o && o.rows && o.rows.length && idbOk) {
+      const id = uid();
+      await DB.put({ id, owner: ownerEmail(), name: o.source || 'Saved list', source: o.source || 'Saved list', createdAt: now, updatedAt: now, columns: o.columns || [], emailCol: o.emailCol, nameCol: o.nameCol, scheduleId: oldSched, subject: o.subject || '', body: o.body || '', bodyHtml: o.bodyHtml || '', bodyMode: o.bodyMode, testSent: !!o.testSent, rows: o.rows });
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ owner: ownerEmail(), listId: id, subject: o.subject || '', body: o.body || '', bodyHtml: o.bodyHtml || '', bodyMode: o.bodyMode, previewId: o.previewId, testSent: !!o.testSent }));
+    }
+  } catch (e) { /* nothing to migrate */ }
+}
+async function restoreDraft() {
+  await migrateOld();
+  let d = null; try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) {}
+  if (!d || (d.owner && d.owner !== ownerEmail())) return false;
+  $('#subject').value = d.subject || ''; $('#body').value = d.body || ''; $('#bodyHtml').value = d.bodyHtml || '';
+  setBodyMode(d.bodyMode === 'html' ? 'html' : 'text', true); S.testSent = !!d.testSent;
+  if (d.listId && idbOk) {
+    try {
+      const e = await DB.get(d.listId);
+      if (e && e.owner === ownerEmail()) {
+        loadEntry(e, false); if (d.previewId && rowById(d.previewId)) S.previewId = d.previewId;
+        const sent = S.rows.filter(r => r.status === 'sent').length;
+        S.restoredMsg = 'Picked up where you left off' + (sent ? ' (' + sent + ' already sent)' : '') + '.';
+        return true;
+      }
+    } catch (err) { idbOk = false; }
+  }
+  return !!(d.subject || d.body);
+}
+
+/* ----- history popup ----- */
+async function histAll() {
+  if (!idbOk) return [];
+  try { return (await DB.all()).filter(e => e.owner === ownerEmail()).sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt))); }
+  catch (e) { idbOk = false; return []; }
+}
+function countRows(rows) {
+  const c = { total: 0, sent: 0, failed: 0, queued: 0, ready: 0 };
+  (rows || []).forEach(r => { if (r.status === 'invalid' || r.status === 'duplicate') return; c.total++; if (c[r.status] != null) c[r.status]++; else c.ready++; });
+  return c;
+}
+const emailOfRow = (r, e) => r.email || cleanEmail((r.data || {})[e.emailCol] || '');
+function histCard(e, i) {
+  const c = countRows(e.rows), pct = n => c.total ? (n / c.total * 100).toFixed(1) : 0, cur = e.id === S.listId;
+  const live = e.sched && (e.sched.status === 'active' || e.sched.status === 'paused');
+  const badge = live ? '<span class="badge ' + (e.sched.status === 'paused' ? 'paused' : 'live') + '">' + (e.sched.status === 'paused' ? 'Paused' : 'Sending on a schedule') + '</span>' : (cur ? '<span class="badge">Open now</span>' : '');
+  return '<div class="hcard' + (cur ? ' cur' : '') + '" style="--i:' + Math.min(i, 10) + '" data-id="' + esc(e.id) + '">' +
+    '<div class="t">' + esc(e.name || 'Untitled list') + badge + '</div>' +
+    '<div class="m">Loaded ' + esc(fmtDate(e.createdAt)) + (e.subject ? ' · Subject: ' + esc(e.subject.slice(0, 60)) : '') + '</div>' +
+    '<div class="hbar"><i class="bs" data-w="' + pct(c.sent) + '"></i><i class="bf" data-w="' + pct(c.failed) + '"></i><i class="bq" data-w="' + pct(c.queued) + '"></i></div>' +
+    '<div class="hnums"><span><b>' + c.total + '</b> people</span><span><b>' + c.sent + '</b> sent</span>' + (c.failed ? '<span><b>' + c.failed + '</b> failed</span>' : '') + (c.queued ? '<span><b>' + c.queued + '</b> waiting in schedule</span>' : '') + (c.ready ? '<span><b>' + c.ready + '</b> not sent yet</span>' : '') + '</div>' +
+    '<div class="hact"><button class="btn primary" data-act="open" type="button"' + (cur ? ' disabled' : '') + '>' + (cur ? 'Open now' : 'Open') + '</button>' +
+    '<button class="btn" data-act="report" type="button">Download report</button>' +
+    '<button class="btn danger" data-act="del" type="button"' + (live ? ' disabled title="Cancel its schedule first"' : '') + '>Delete</button></div></div>';
+}
+let histEntries = [];
+async function renderHistory() {
+  histEntries = await histAll();
+  const box = $('#histList');
+  box.innerHTML = histEntries.length ? histEntries.map(histCard).join('') : '<div class="hempty">' + (idbOk ? 'No saved lists yet. Load one and it will show up here.' : 'History is not available in this browser mode (private windows block it).') + '</div>';
+  requestAnimationFrame(() => box.querySelectorAll('.hbar i').forEach(b => { b.style.width = b.dataset.w + '%'; }));
+  $('#histClear').hidden = !histEntries.length;
+  try {
+    if (navigator.storage && navigator.storage.estimate) { const est = await navigator.storage.estimate(); $('#histStore').textContent = 'Using ' + (est.usage / 1048576 < 0.1 ? 'under 0.1' : (est.usage / 1048576).toFixed(1)) + ' MB on this device'; }
+    else $('#histStore').textContent = '';
+  } catch (e) { $('#histStore').textContent = ''; }
+}
+// Lists with a running schedule: ask the server so the numbers in History are the real ones.
+async function syncHistory() {
+  for (const e of histEntries.filter(x => x.scheduleId && x.id !== S.listId)) {
+    try {
+      const d = await scheduleApi.status(e.scheduleId, true); e.sched = d;
+      applyDetail(e.rows, d, r => emailOfRow(r, e));
+      if (d.status === 'done' || d.status === 'canceled') e.scheduleId = null;
+      await DB.put(e);
+    } catch (err) {
+      if (err.status === 404) { e.scheduleId = null; e.sched = null; e.rows.forEach(r => { if (r.status === 'queued') { r.status = 'ready'; r.selected = true; } }); try { await DB.put(e); } catch (x) {} }
+    }
+    if (!$('#histPop').hidden) { const old = $('#histList').querySelector('[data-id="' + CSS.escape(e.id) + '"]'); if (old) { const tmp = document.createElement('div'); tmp.innerHTML = histCard(e, 0); const n = tmp.firstChild; n.style.animation = 'none'; n.querySelectorAll('.hbar i').forEach(b => { b.style.width = b.dataset.w + '%'; }); old.replaceWith(n); } }
+  }
+}
+async function openHistory() {
+  $('#histPop').hidden = false; await saveNow(); await renderHistory(); syncHistory();
+}
+function openFromHistory(id) {
+  const e = histEntries.find(x => x.id === id); if (!e) return;
+  if (S.sending) return toast('Wait for the current send to finish.', 'bad');
+  saveNow(); loadEntry(e, true); $('#histPop').hidden = true; renderNow(); renderSchedule(); pollSchedule();
+  toast('Opened "' + (e.name || 'list') + '".', 'good');
+}
+function reportFor(rows, e, name) {
+  const lines = [['Email', 'Name', 'Status', 'Sent at', 'Details'].map(csvCell).join(',')];
+  const lab = { sent: 'Sent', failed: 'Failed', queued: 'Waiting', ready: 'Not sent yet', invalid: 'Skipped (invalid email)', duplicate: 'Skipped (duplicate)', sending: 'Sending' };
+  rows.forEach(r => lines.push([emailOfRow(r, e), e.nameCol ? (r.data || {})[e.nameCol] : '', lab[r.status] || r.status, r.sentAt ? new Date(r.sentAt).toLocaleString() : '', r.error || ''].map(csvCell).join(',')));
+  download('report-' + String(name || 'list').replace(/[^\w.-]+/g, '_').replace(/\.(csv|xlsx|txt|tsv)$/i, '').slice(0, 40) + '-' + new Date().toISOString().slice(0, 10) + '.csv', lines.join('\r\n'));
+}
+function downloadReport() { if (!S.rows.length) return toast('Load a list first.', 'bad'); reportFor(S.rows, { emailCol: S.emailCol, nameCol: S.nameCol }, S.source); }
+async function pruneHistory() {
+  try {
+    const all = (await DB.all()).filter(e => e.owner === ownerEmail()).sort((a, b) => String(a.updatedAt).localeCompare(String(b.updatedAt)));
+    let extra = all.length - MAX_HISTORY;
+    for (const e of all) { if (extra <= 0) break; if (e.id === S.listId || e.scheduleId) continue; await DB.del(e.id); extra--; }
+  } catch (e) {}
+}
 
 /* ---------- actions ---------- */
-function loadText(text, source) {
+function afterImport() {
   const err = $('#importErr');
-  try {
-    importText(text, source);
-    err.hidden = true; $('#paste').value = '';
-    const skipped = S.rows.filter(r => r.status === 'invalid' || r.status === 'duplicate').length;
-    const ready = S.rows.filter(r => r.status === 'ready').length;
-    toast('Loaded ' + plural(ready, 'recipient') + (skipped ? ', skipped ' + skipped : '') + '.', 'good');
-    if (S.bodyMode !== 'html' && !$('#body').value.trim()) {
-      const first = S.nameCol || S.columns.some(c => norm(c) === 'firstname');
-      $('#body').value = (first ? 'Hi {{first_name|there}},' : 'Hello,') + '\n\n\n\nThanks,\n' + (S.info ? S.info.name : '');
-    }
-    render();
-    const target = $('#subject').value.trim() ? activeBodyEl() : $('#subject');
-    if (window.innerWidth > 900) target.focus();
-  } catch (e) { err.textContent = errMsg(e); err.hidden = false; toast(errMsg(e), 'bad'); }
+  err.hidden = true; $('#paste').value = '';
+  const skipped = S.rows.filter(r => r.status === 'invalid' || r.status === 'duplicate').length;
+  const ready = S.rows.filter(r => r.status === 'ready').length;
+  toast('Loaded ' + plural(ready, 'recipient') + (skipped ? ', skipped ' + skipped : '') + '. Saved to History.', 'good');
+  if (S.bodyMode !== 'html' && !$('#body').value.trim()) {
+    const first = S.nameCol || S.columns.some(c => norm(c) === 'firstname');
+    $('#body').value = (first ? 'Hi {{first_name|there}},' : 'Hello,') + '\n\n\n\nThanks,\n' + (S.info ? S.info.name : '');
+  }
+  render(); saveNow(); pruneHistory(); renderSchedule(); pollSchedule();
+  const target = $('#subject').value.trim() ? activeBodyEl() : $('#subject');
+  if (window.innerWidth > 900) target.focus();
 }
-function loadFile(f) {
+function importFail(e) { const err = $('#importErr'); err.textContent = errMsg(e); err.hidden = false; toast(errMsg(e), 'bad'); }
+function keepCurrentList() { if (S.rows.length && S.listId) saveNow(); }   // the list being replaced stays in History
+function loadText(text, source) {
+  try { keepCurrentList(); importText(text, source); afterImport(); } catch (e) { importFail(e); }
+}
+function loadGrid(grid, source) {
+  try { keepCurrentList(); importGrid(grid, source); afterImport(); } catch (e) { importFail(e); }
+}
+const cellText = v => v == null ? '' : (v instanceof Date ? v.toISOString().slice(0, 10) : String(v));
+async function loadFile(f) {
   if (!f) return;
+  const name = f.name || 'file';
+  if (/\.xls$/i.test(name)) return toast('Old .xls files are not supported. In Excel, choose Save As and pick .xlsx or CSV.', 'bad');
+  if (/\.xlsx$/i.test(name) || /spreadsheetml/.test(f.type || '')) {
+    if (typeof readXlsxFile !== 'function') return toast('Excel support did not load. Refresh the page and try again.', 'bad');
+    try { const rows = await readXlsxFile(f); loadGrid(rows.map(r => r.map(cellText)), name); }
+    catch (e) { toast("Couldn't read that Excel file. Try saving it again as .xlsx, or as CSV.", 'bad'); }
+    return;
+  }
   const r = new FileReader();
-  r.onload = () => loadText(r.result, f.name);
+  r.onload = () => loadText(r.result, name);
   r.onerror = () => toast('Could not read that file.', 'bad');
   r.readAsText(f);
 }
@@ -1037,9 +1330,15 @@ function armed(btn, label, action) {
   btn.dataset.armed = setTimeout(() => { btn.textContent = btn.dataset.orig; delete btn.dataset.armed; }, 3000);
 }
 function replaceList() {
+  const had = S.rows.length;
+  if (had && S.listId) saveNow();                 // goes to History first, so nothing is lost
   S.rows = []; S.columns = []; S.emailCol = S.nameCol = null; S.previewId = null; S.summary = ''; S.confirming = false;
-  render();
+  S.source = ''; S.listId = null; S.scheduleId = null; S.sched = null; S.schedDismissed = null;
+  clearDraftList();
+  render(); renderSchedule();
+  if (had) toast('Saved in History. Load a new list whenever you are ready.');
 }
+function clearDraftList() { try { const d = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); if (d) { d.listId = null; localStorage.setItem(DRAFT_KEY, JSON.stringify(d)); } } catch (e) {} }
 
 async function sendTest() {
   const r = previewRow();
@@ -1066,7 +1365,7 @@ async function runSend() {
     r.status = 'sending'; r.error = ''; S.progress.current = r.email; renderNow();
     try {
       await T.send({ recipient: r.email, subject: merge(subjTpl, r, false), body: merge(tpl, r, false), isHtml });
-      r.status = 'sent'; r.selected = false; r.flash = 'sent'; sent++; streak = 0;
+      r.status = 'sent'; r.sentAt = new Date().toISOString(); r.selected = false; r.flash = 'sent'; sent++; streak = 0;
     } catch (e) {
       r.status = 'failed'; r.error = errMsg(e); r.flash = 'failed'; failed++; streak++;
       if (e.status === 401) { halted = 'Gmail rejected the sign-in. Sign in again, then press Send to continue.'; r.status = 'ready'; r.error = ''; r.flash = null; failed--; authFailed(); }
@@ -1092,56 +1391,224 @@ function authFailed() {
   showLogin('Gmail rejected the saved sign-in. Enter your App Password again to continue.', a);
 }
 
-/* ---------- schedule status bar ---------- */
-let schedPollTimer = 0;
-function renderSchedule(info) {
-  const bar = $('#schedBar');
-  if (!info || info.status !== 'active') { bar.hidden = true; return; }
-  bar.hidden = false;
-  const pct = info.total ? Math.round(info.sent / info.total * 100) : 0;
-  const capHit = info.sentToday >= info.batchSize;
-  const note = capHit ? "today's cap of " + info.batchSize + " reached — resumes after midnight UTC"
-    : 'sends ' + info.perCall + ' per check-in, up to ' + info.batchSize + '/day (' + info.sentToday + ' so far today)';
-  $('#schedin').innerHTML =
-    '<span class="sdot"></span><span><b>Scheduled</b> — ' + info.sent + ' of ' + info.total + ' sent' + (info.failed ? ', ' + info.failed + ' failed' : '') + '</span>' +
-    '<span class="sbar"><i style="width:' + pct + '%"></i></span>' +
-    '<span class="snote">' + note + '</span>' +
-    '<button type="button" id="schedCancelInline">Cancel</button>';
+/* ---------- scheduling: status, bar and the set-up form ---------- */
+// Copy what the server knows (sent / failed / still waiting) onto a list of rows.
+function applyDetail(rows, d, getEmail) {
+  const map = new Map((d.recipients || []).map(x => [String(x.email).toLowerCase(), x]));
+  const ended = d.status === 'done' || d.status === 'canceled';
+  let changed = false;
+  for (const r of rows) {
+    if (r.status === 'invalid' || r.status === 'duplicate') continue;
+    const x = map.get(String(getEmail(r) || '').toLowerCase());
+    if (!x) { if (ended && r.status === 'queued') { r.status = 'ready'; r.selected = true; changed = true; } continue; }
+    if (x.state === 'sent') {
+      if (r.status !== 'sent') { r.status = 'sent'; r.sentAt = x.at; r.error = ''; r.selected = false; r.flash = 'sent'; changed = true; }
+    } else if (x.state === 'failed') {
+      if (r.status !== 'failed' || r.error !== x.error) { r.status = 'failed'; r.error = x.error || 'Failed'; r.sentAt = x.at || r.sentAt; r.selected = true; r.flash = 'failed'; changed = true; }
+    } else if (ended) {
+      if (r.status === 'queued') { r.status = 'ready'; r.selected = true; changed = true; }
+    } else if (r.status !== 'queued' && r.status !== 'sent') { r.status = 'queued'; r.selected = false; r.error = ''; changed = true; }
+  }
+  return changed;
 }
-async function refreshSchedule() {
-  const id = savedScheduleId();
-  if (!id) { renderSchedule(null); return; }
-  try { renderSchedule(await scheduleApi.status(id)); }
-  catch (e) { saveScheduleId(null); renderSchedule(null); }
+
+// When is the next time this schedule is allowed to send (ignoring the wait between groups)?
+function nextOpenTime(s) {
+  let t = Math.max(Date.now(), s.startAt ? new Date(s.startAt).getTime() : 0);
+  const today = localParts(new Date(), s.tz).date, capHit = s.sentToday >= s.dailyLimit;
+  for (let i = 0; i < 8 * 96; i++, t += 15 * 60000) {
+    const p = localParts(new Date(t), s.tz);
+    if (capHit && p.date === today) continue;
+    if (s.days.includes(p.dow) && p.minutes >= s.windowStart && p.minutes < s.windowEnd) return t;
+  }
+  return null;
 }
-async function cancelSchedule() {
-  const id = savedScheduleId();
-  if (!id) return;
-  try { await scheduleApi.cancel(id); } catch (e) {}
-  saveScheduleId(null); renderSchedule(null); renderBar();
-  toast('Schedule canceled.');
+function fmtIn(tz, t) {
+  const now = localParts(new Date(), tz), p = localParts(new Date(t), tz);
+  const tm = new Intl.DateTimeFormat([], { timeZone: tz, hour: 'numeric', minute: '2-digit' }).format(new Date(t));
+  if (p.date === now.date) return 'today at ' + tm;
+  return new Intl.DateTimeFormat([], { timeZone: tz, weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(t)) + ' at ' + tm;
 }
-$('#schedBar').addEventListener('click', e => { if (e.target.id === 'schedCancelInline') cancelSchedule(); });
+function nextInfo(s) {
+  if (s.status !== 'active') return '';
+  const now = Date.now();
+  if (s.sentToday >= s.dailyLimit) { const t = nextOpenTime(s); return 'daily limit reached' + (t ? ', continues ' + fmtIn(s.tz, t) : ''); }
+  const t = nextOpenTime(s);
+  if (t && t - now > 15 * 60000 + 60000) return 'next send ' + fmtIn(s.tz, t);
+  const lp = localParts(new Date(), s.tz), open = s.days.includes(lp.dow) && lp.minutes >= s.windowStart && lp.minutes < s.windowEnd;
+  if (!open) return t ? 'next send ' + fmtIn(s.tz, t) : '';
+  const due = s.lastBatchAt ? new Date(s.lastBatchAt).getTime() + s.intervalMin * 60000 : now;
+  const mins = Math.ceil((due - now) / 60000);
+  return mins > 1 ? 'next group in about ' + mins + ' min' : 'next group within a minute';
+}
+
+function renderSchedule() {
+  const bar = $('#schedBar'), s = S.sched;
+  if (bar.querySelector('[data-armed]')) return;             // don't redraw while a button is waiting for its second click
+  if (!s || s.status === 'canceled' || (s.status === 'done' && S.schedDismissed === s.id)) { bar.hidden = true; document.body.classList.remove('hasSched'); return; }
+  const pct = s.total ? Math.round(s.sent / s.total * 100) : 0;
+  const stale = s.status === 'active' && (!s.checkerAt || Date.now() - new Date(s.checkerAt).getTime() > 10 * 60000);
+  const finished = s.status === 'done', paused = s.status === 'paused';
+  bar.hidden = false; bar.className = finished ? 'finished' : paused ? 'paused' : '';
+  const counts = s.sent + ' of ' + s.total + ' sent' + (s.failed ? ', ' + s.failed + ' failed' : '');
+  let note;
+  if (finished) note = 'All done. Download the report any time.';
+  else if (paused) note = s.lastError ? s.lastError : 'Paused. Nothing is being sent.';
+  else note = s.sentToday + ' of ' + s.dailyLimit + ' sent today' + (nextInfo(s) ? ' · ' + nextInfo(s) : '');
+  const btns = finished ? '<button type="button" id="schedReport">Download report</button><button type="button" id="schedDismiss">Dismiss</button>'
+    : (paused ? '<button type="button" id="schedResume">Resume</button>' : '<button type="button" id="schedPause">Pause</button>') + '<button type="button" id="schedCancelInline">Cancel</button>';
+  $('#schedin').innerHTML = '<span class="sdot"></span><span><b>' + (finished ? 'Finished' : paused ? 'Paused' : 'Scheduled') + '</b> · ' + esc(counts) + '</span>' +
+    '<span class="sbar"><i style="width:' + pct + '%"></i></span><span class="snote' + (paused && s.lastError ? ' warn' : '') + '">' + esc(note) + '</span>' + btns;
+  let w = bar.querySelector('.schedwarn'); if (w) w.remove();
+  if (stale) { w = document.createElement('div'); w.className = 'schedwarn'; w.textContent = 'The automatic sender has not checked in' + (s.checkerAt ? ' for ' + ago(s.checkerAt).replace(' ago', '') : ' yet') + ', so nothing will go out until it is running again. Check that your cron-job.org job is switched on and runs every minute.'; bar.appendChild(w); }
+}
+let pollTimer = 0;
+async function pollSchedule() {
+  clearTimeout(pollTimer);
+  if (S.scheduleId) {
+    try {
+      const d = await scheduleApi.status(S.scheduleId, true), prev = S.sched;
+      S.sched = d;
+      const changed = applyDetail(S.rows, d, r => r.email);
+      if (prev && prev.status === 'active' && d.status === 'done') { toast('Schedule finished: ' + d.sent + ' sent' + (d.failed ? ', ' + d.failed + ' failed' : '') + '.', d.failed ? '' : 'good'); if (!d.failed) confetti(); }
+      if (prev && prev.status === 'active' && d.status === 'paused' && d.lastError) toast('Schedule paused: ' + d.lastError, 'bad');
+      if (d.status === 'done' || d.status === 'canceled') S.scheduleId = null;
+      if (changed || d.status !== (prev && prev.status)) renderNow(); else save();
+    } catch (e) {
+      if (e.status === 404) { S.scheduleId = null; S.sched = null; S.rows.forEach(r => { if (r.status === 'queued') { r.status = 'ready'; r.selected = true; } }); renderNow(); }
+    }
+  } else if (S.sched && S.sched.status !== 'done') S.sched = null;
+  renderSchedule();
+  pollTimer = setTimeout(pollSchedule, S.sched && S.sched.status === 'active' ? 15000 : 60000);
+}
+async function scheduleAction(kind) {
+  if (!S.sched) return;
+  try {
+    if (kind === 'cancel') {
+      await scheduleApi.cancel(S.sched.id);
+      S.rows.forEach(r => { if (r.status === 'queued') { r.status = 'ready'; r.selected = true; } });
+      S.scheduleId = null; S.sched = null; renderNow(); renderSchedule(); toast('Schedule canceled. The people still waiting are back to ready.');
+    } else {
+      S.sched = Object.assign({}, S.sched, await scheduleApi.pause(S.sched.id, kind));
+      renderSchedule(); toast(kind === 'pause' ? 'Paused. Nothing will be sent until you resume.' : 'Resumed.', 'good'); pollSchedule();
+    }
+  } catch (e) { toast(errMsg(e), 'bad'); }
+}
+$('#schedBar').addEventListener('click', e => {
+  const id = e.target.id;
+  if (id === 'schedPause') scheduleAction('pause');
+  else if (id === 'schedResume') scheduleAction('resume');
+  else if (id === 'schedCancelInline') armed(e.target, 'Click again to cancel', () => scheduleAction('cancel'));
+  else if (id === 'schedReport') downloadReport();
+  else if (id === 'schedDismiss') { S.schedDismissed = S.sched && S.sched.id; renderSchedule(); }
+});
+
+/* ----- the set-up form ----- */
+const SD = { days: new Set([1, 2, 3, 4, 5]) };
+function schedPrefs() { try { return JSON.parse(localStorage.getItem(PREFS_KEY) || 'null') || {}; } catch (e) { return {}; } }
+function buildDayChips() {
+  $('#sdDays').innerHTML = [1, 2, 3, 4, 5, 6, 0].map(d => '<button type="button" class="dchip' + (SD.days.has(d) ? ' on' : '') + '" data-d="' + d + '" aria-pressed="' + SD.days.has(d) + '">' + DAY_NAMES[d] + '</button>').join('');
+}
+function openSchedule() {
+  const total = pending().length, p = schedPrefs();
+  $('#sdEvery').innerHTML = EVERY_OPTS.map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join('');
+  $('#sdDaily').value = p.daily ? Math.min(500, p.daily) : Math.min(50, Math.max(1, total));
+  $('#sdPer').value = p.per || Math.max(1, Math.min(10, Math.ceil(+$('#sdDaily').value / 5)));
+  $('#sdEvery').value = String(p.every || 15);
+  $('#sdFrom').value = toHHMM(p.from != null ? p.from : 480); $('#sdTo').value = toHHMM(p.to != null ? p.to : 1080);
+  SD.days = new Set(p.days && p.days.length ? p.days : [1, 2, 3, 4, 5]); buildDayChips();
+  $('#sdStartNow').checked = true; $('#sdStartAt').hidden = true; $('#sdStartAt').value = '';
+  $('#sdTz').textContent = 'Outside these hours nothing is sent. Your time zone: ' + TZ.replace(/_/g, ' ') + '.';
+  $('#schedPop').hidden = false; updateSummary(true);
+}
+function readSched() {
+  return { daily: clampInt($('#sdDaily').value, 1, 500, 50), per: clampInt($('#sdPer').value, 1, 20, 10), every: +$('#sdEvery').value || 15,
+    from: toMin($('#sdFrom').value), to: toMin($('#sdTo').value), days: [...SD.days].sort((a, b) => a - b),
+    later: $('#sdStartLater').checked, startAt: $('#sdStartAt').value };
+}
+function schedMath(v, total) {
+  const windowMin = v.to - v.from;
+  const groups = Math.max(1, Math.ceil(windowMin / v.every));
+  const perDay = Math.min(v.daily, groups * Math.min(v.per, v.daily));
+  const start = v.later && v.startAt ? new Date(v.startAt) : new Date();
+  let left = total, n = 0, last = null; const day = new Date(start); day.setHours(12, 0, 0, 0);
+  const nowMin = start.getHours() * 60 + start.getMinutes();
+  for (let guard = 0; left > 0 && guard < 800; guard++, day.setDate(day.getDate() + 1)) {
+    if (!v.days.includes(day.getDay())) continue;
+    if (guard === 0 && nowMin >= v.to) continue;
+    left -= perDay; n++; last = new Date(day);
+  }
+  return { windowMin, groups, perDay, daysNeeded: n, finish: last };
+}
+function updateSummary(first) {
+  const v = readSched(), total = pending().length, box = $('#sdSummary'), btn = $('#schedStartBtn');
+  let bad = '';
+  if (isNaN(v.from) || isNaN(v.to)) bad = 'Pick a start and end time.';
+  else if (v.to <= v.from) bad = 'The end time has to be after the start time.';
+  else if (!v.days.length) bad = 'Pick at least one day.';
+  else if (v.later && !v.startAt) bad = 'Pick the date and time to start.';
+  else if (v.later && isNaN(new Date(v.startAt).getTime())) bad = 'That start time is not valid.';
+  btn.disabled = !!bad;
+  box.className = 'sd-sum' + (bad ? ' bad' : '');
+  if (bad) { box.textContent = bad; return; }
+  const m = schedMath(v, total), per = Math.min(v.per, v.daily);
+  let html = '<span class="big">Up to ' + m.perDay + ' emails a day</span>' +
+    '<b>' + total + '</b> ' + (total === 1 ? 'email' : 'emails') + ' will take about <b>' + plural(m.daysNeeded, 'sending day') + '</b>' + (m.finish ? ', done around ' + m.finish.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }) : '') + '.';
+  if (m.perDay < v.daily) { html += '<span class="tip">You set ' + v.daily + ' a day, but these hours and gaps only fit ' + m.perDay + '. Use longer hours, shorter gaps, or more emails each time to reach ' + v.daily + '.</span>'; box.classList.add('warn'); }
+  box.innerHTML = html;
+  if (!first && !REDUCED) { box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash'); }
+}
 $('#schedPop').addEventListener('click', e => { if (e.target === e.currentTarget) $('#schedPop').hidden = true; });
+$('#schedPop').addEventListener('input', () => updateSummary());
+$('#schedPop').addEventListener('change', e => { if (e.target.name === 'sdStart') { $('#sdStartAt').hidden = !$('#sdStartLater').checked; if (!$('#sdStartAt').hidden && !$('#sdStartAt').value) { const d = new Date(Date.now() + 3600000); d.setMinutes(0, 0, 0); $('#sdStartAt').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); } } updateSummary(); });
+$('#sdDays').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return; const d = +b.dataset.d;
+  SD.days.has(d) ? SD.days.delete(d) : SD.days.add(d); b.classList.toggle('on', SD.days.has(d)); b.setAttribute('aria-pressed', SD.days.has(d)); updateSummary();
+});
+$('#sdAll').onclick = () => { SD.days = new Set([0, 1, 2, 3, 4, 5, 6]); buildDayChips(); updateSummary(); };
+$('#sdWeek').onclick = () => { SD.days = new Set([1, 2, 3, 4, 5]); buildDayChips(); updateSummary(); };
 $('#schedCancelBtn').onclick = () => { $('#schedPop').hidden = true; };
 $('#schedStartBtn').onclick = async () => {
-  const size = Math.max(1, Math.min(500, +$('#schedSize').value || 50));
-  const a = Account.get();
+  const v = readSched(), a = Account.get();
   if (!a) { $('#schedPop').hidden = true; return showLogin(); }
+  const list = pending(); if (!list.length) return toast('Nobody is selected to send to.', 'bad');
   const btn = $('#schedStartBtn'); btn.disabled = true; btn.textContent = 'Starting…';
   try {
     const rec = await scheduleApi.start({
-      account: a, subject: $('#subject').value.trim(), body: bodyVal().trim(), isHtml: S.bodyMode === 'html',
-      batchSize: size, perCall: Math.max(1, Math.min(500, +$('#schedSlice').value || 10)), columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol,
-      recipients: pending().map(r => ({ email: r.email, data: r.data }))
+      account: a, name: S.source, subject: $('#subject').value.trim(), body: bodyVal().trim(), isHtml: S.bodyMode === 'html',
+      dailyLimit: v.daily, perBatch: Math.min(v.per, v.daily), intervalMin: v.every, windowStart: v.from, windowEnd: v.to, days: v.days, timezone: TZ,
+      startAt: v.later && v.startAt ? new Date(v.startAt).toISOString() : null,
+      columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol, recipients: list.map(r => ({ email: r.email, data: r.data }))
     });
-    saveScheduleId(rec.id); renderSchedule(rec); $('#schedPop').hidden = true; renderBar();
-    toast('Scheduled — ' + rec.total + ' emails, ' + size + ' a day.', 'good');
+    try { localStorage.setItem(PREFS_KEY, JSON.stringify({ daily: v.daily, per: v.per, every: v.every, from: v.from, to: v.to, days: v.days })); } catch (e) {}
+    list.forEach(r => { r.status = 'queued'; r.selected = false; r.error = ''; });
+    S.scheduleId = rec.id; S.sched = rec; S.schedDismissed = null; S.confirming = false;
+    $('#schedPop').hidden = true; renderNow(); renderSchedule(); saveNow(); pollSchedule();
+    toast('Scheduled. ' + plural(rec.total, 'email') + ', up to ' + rec.dailyLimit + ' a day.', 'good');
   } catch (e) { toast(errMsg(e), 'bad'); }
-  btn.disabled = false; btn.textContent = 'Start schedule';
+  btn.disabled = false; btn.textContent = 'Start schedule'; updateSummary(true);
 };
 
 /* ---------- events ---------- */
+$('#btnHistory1').onclick = $('#btnHistory2').onclick = () => openHistory();
+$('#btnReport').onclick = () => downloadReport();
+$('#histClose').onclick = () => { $('#histPop').hidden = true; };
+$('#histPop').addEventListener('click', e => { if (e.target === e.currentTarget) $('#histPop').hidden = true; });
+$('#histList').addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return; const card = b.closest('.hcard'), id = card.dataset.id, en = histEntries.find(x => x.id === id); if (!en) return;
+  if (b.dataset.act === 'open') openFromHistory(id);
+  else if (b.dataset.act === 'report') reportFor(en.rows, en, en.name);
+  else if (b.dataset.act === 'del') armed(b, 'Delete? Click again', async () => {
+    try { await DB.del(id); } catch (x) {}
+    if (id === S.listId) { S.rows = []; S.columns = []; S.emailCol = S.nameCol = null; S.previewId = null; S.listId = null; S.scheduleId = null; S.sched = null; clearDraftList(); render(); renderSchedule(); }
+    card.style.transition = 'opacity .25s, transform .25s'; card.style.opacity = '0'; card.style.transform = 'scale(.96)';
+    setTimeout(() => renderHistory(), 260);
+  });
+});
+$('#histClear').onclick = e => armed(e.currentTarget, 'Delete all? Click again', async () => {
+  for (const en of histEntries) { if (en.scheduleId) continue; try { await DB.del(en.id); } catch (x) {} if (en.id === S.listId) { S.rows = []; S.columns = []; S.emailCol = S.nameCol = null; S.listId = null; S.previewId = null; clearDraftList(); render(); } }
+  renderHistory(); toast('History cleared. Lists with a running schedule were kept.');
+});
 $('#btnChoose').onclick = () => $('#file').click();
 $('#file').onchange = e => { loadFile(e.target.files[0]); e.target.value = ''; };
 $('#btnSample').onclick = () => {
@@ -1169,10 +1636,9 @@ window.addEventListener('dragleave', e => { if (hasFiles(e) && --dragDepth <= 0)
 window.addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
 window.addEventListener('drop', e => { if (!hasFiles(e)) return; e.preventDefault(); dragDepth = 0; $('#dropOverlay').hidden = true; if (S.sending) return toast('Wait for the current send to finish.', 'bad'); loadFile(e.dataTransfer.files[0]); });
 
-$('#btnReplace').onclick = e => {
-  const hasSent = S.rows.some(r => r.status === 'sent');
+$('#btnReplace').onclick = () => {
   if (S.sending) return toast('Wait for the current send to finish.', 'bad');
-  hasSent ? armed(e.currentTarget, 'Sent history will be lost. Click again', replaceList) : replaceList();
+  replaceList();
 };
 $('#filters').onclick = e => { const b = e.target.closest('[data-f]'); if (b) { S.filter = b.dataset.f; render(); } };
 $('#search').oninput = e => { S.query = e.target.value; render(); };
@@ -1221,9 +1687,14 @@ $('#sendin').addEventListener('click', e => {
   else if (id === 'btnCancel') { S.confirming = false; renderBar(); }
   else if (id === 'btnConfirm') runSend();
   else if (id === 'btnStop') { S.stop = true; renderBar(); }
-  else if (id === 'btnScheduleOpen') { const n = Math.min(500, pending().length || 50); $('#schedSize').value = n; $('#schedSlice').value = Math.max(1, Math.min(n, Math.ceil(n / 5))); $('#schedPop').hidden = false; }
+  else if (id === 'btnScheduleOpen') openSchedule();
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.confirming) { S.confirming = false; renderBar(); } });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!$('#schedPop').hidden) $('#schedPop').hidden = true;
+  else if (!$('#histPop').hidden) $('#histPop').hidden = true;
+  else if (S.confirming) { S.confirming = false; renderBar(); }
+});
 window.addEventListener('beforeunload', e => { if (S.sending) { e.preventDefault(); e.returnValue = ''; } });
 
 /* ---------- ripple ---------- */
@@ -1287,24 +1758,24 @@ $('#loginForm').addEventListener('submit', async e => {
   try {
     await T.login({ email, password: pass, name });
     Account.set({ email, password: pass, name: name || email.split('@')[0] });
-    demoMem = false; try { sessionStorage.removeItem('gcm.demo'); } catch (x) {}
     btn.classList.remove('busy'); btn.classList.add('ok'); btn.querySelector('span').textContent = 'Connected';
     await sleep(REDUCED ? 0 : 450);
     enterApp();
   } catch (x) { loginFail(errMsg(x)); }
 });
-$('#btnDemo').onclick = () => { demoMem = true; try { sessionStorage.setItem('gcm.demo', '1'); } catch (x) {} enterApp(); };
-$('#btnSignOut').onclick = e => {
+$('#btnSignOut').onclick = () => {
   if (S.sending) return toast('Wait for the current send to finish.', 'bad');
-  const go = () => {
-    Account.clear(); demoMem = false; try { sessionStorage.removeItem('gcm.demo'); } catch (x) {}
-    S.info = null; S.testSent = false; S.summary = '';
-    $('#subject').value = ''; $('#body').value = ''; $('#bodyHtml').value = ''; setBodyMode('text', true);
-    replaceList(); clearSaved();
-    ['#lgEmail', '#lgName'].forEach(s => $(s).value = '');
-    renderQuota(); showLogin();
-  };
-  S.rows.length ? armed(e.currentTarget, 'This clears your list. Click again', go) : go();
+  if (S.rows.length && S.listId) saveNow();      // the list stays in History on this device
+  const hadSched = !!(S.sched && S.sched.status === 'active');
+  clearTimeout(pollTimer); clearTimeout(saveTimer);
+  Account.clear(); clearDraft();
+  S.info = null; S.testSent = false; S.summary = '';
+  $('#subject').value = ''; $('#body').value = ''; $('#bodyHtml').value = ''; setBodyMode('text', true);
+  S.rows = []; S.columns = []; S.emailCol = S.nameCol = null; S.previewId = null; S.listId = null; S.scheduleId = null; S.sched = null; S.source = '';
+  render(); renderSchedule();
+  ['#lgEmail', '#lgName'].forEach(s => $(s).value = '');
+  renderQuota(); showLogin();
+  toast(hadSched ? 'Signed out. Your schedule keeps running.' : 'Signed out. Your lists stay in History on this device.');
 };
 
 /* ---------- boot ---------- */
@@ -1312,23 +1783,30 @@ function revealApp() {
   const app = $('.app'); document.body.classList.remove('booting');
   app.classList.remove('reveal'); void app.offsetWidth; app.classList.add('reveal');
 }
-function boot() {
-  if (!demoOn() && !Account.get()) { showLogin(); return; }
-  T.info().then(i => {
-    S.info = i; renderQuota(); render(); revealApp();
+async function boot() {
+  if (!Account.get()) { showLogin(); return; }
+  try {
+    S.info = await T.info();
+    if (!S.rows.length) await restoreDraft();
+    renderQuota(); render(); revealApp(); renderSchedule();
     if (S.restoredMsg) { toast(S.restoredMsg); S.restoredMsg = ''; }
-  }).catch(e => {
+    pollSchedule();
+  } catch (e) {
     document.body.classList.remove('booting');
     if (e.status === 401) return showLogin();
     $('#pillSender').textContent = 'Not connected'; toast('Something went wrong: ' + errMsg(e), 'bad');
-  });
+  }
 }
+document.addEventListener('visibilitychange', () => { if (!document.hidden && S.info) pollSchedule(); });
+setInterval(() => { if (!document.hidden) renderSchedule(); }, 20000);
+(function layoutWatch() {
+  const f = document.querySelector('.sendbar'), s = $('#schedBar'), root = document.documentElement;
+  const set = () => { root.style.setProperty('--sendH', f.offsetHeight + 'px'); root.style.setProperty('--schedH', s.hidden ? '0px' : s.offsetHeight + 'px'); };
+  if (window.ResizeObserver) { const ro = new ResizeObserver(set); ro.observe(f); ro.observe(s); }
+  window.addEventListener('resize', set); set();
+})();
 window.__gcm = S; // handy when poking around in the console
-restore();
-renderNow();
 boot();
-refreshSchedule();
-setInterval(refreshSchedule, 60000);
 })();
 </script>
 </body>
