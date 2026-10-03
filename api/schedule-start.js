@@ -1,5 +1,6 @@
 const mail = require('../lib/mail');
 const schedule = require('../lib/schedule');
+const track = require('../lib/track');
 
 // Starts a scheduled campaign: verifies the Gmail sign-in once, then stores an
 // encrypted copy of it (see lib/crypto.js) so the daily cron route can send
@@ -7,6 +8,7 @@ const schedule = require('../lib/schedule');
 module.exports = async (req, res) => {
   if (!mail.allowed(req, res)) return;
   const b = mail.bodyOf(req);
+  b.baseUrl = track.baseUrlOf(req);          // links in scheduled emails point back to this app
   try {
     await mail.verify(b.account);
     const rec = await schedule.create(b);
