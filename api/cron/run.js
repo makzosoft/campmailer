@@ -1,4 +1,5 @@
 const schedule = require('../../lib/schedule');
+const track = require('../../lib/track');
 
 // Called on a schedule — by Vercel's own Cron entry (vercel.json), which sends
 // "Authorization: Bearer <CRON_SECRET>" automatically once CRON_SECRET is set,
@@ -13,6 +14,6 @@ module.exports = async (req, res) => {
   const key = (req.query && req.query.key) || url.searchParams.get('key') || '';
   const ok = !!want && (auth === 'Bearer ' + want || key === want);
   if (!ok) return res.status(401).json({ error: 'Unauthorized.' });
-  try { res.status(200).json({ ok: true, results: await schedule.tick() }); }
+  try { res.status(200).json({ ok: true, results: await schedule.tick(track.baseUrlOf(req)) }); }
   catch (e) { res.status(500).json({ error: (e && e.message) || String(e) }); }
 };
