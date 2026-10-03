@@ -1,8 +1,56 @@
 {
   "functions": {
-    "api/cron/run.js": { "maxDuration": 60 }
+    "api/cron/run.js": {
+      "maxDuration": 60
+    }
   },
   "crons": [
-    { "path": "/api/cron/run", "schedule": "0 8 * * *" }
+    {
+      "path": "/api/cron/run",
+      "schedule": "0 8 * * *"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/join/:id",
+      "destination": "/api/subscribe?l=:id"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
+    {
+      "source": "/brand/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    }
   ]
 }
