@@ -74,6 +74,13 @@ EARLIER, IN v5
   - Demo mode is gone.
 
 
+IF SOMETHING BREAKS
+  Open https://YOUR-APP.vercel.app/api/health?key=YOUR_CRON_SECRET
+  It lists which package, file or database setting is missing (it never
+  shows secrets). "FUNCTION_INVOCATION_FAILED" usually means a file or
+  package from the zip was not uploaded, for example package.json.
+
+
 SETUP (once)
   1. GitHub: upload this folder's contents to the ROOT of your repo
      (api/, lib/, public/, package.json, vercel.json at the top level).
