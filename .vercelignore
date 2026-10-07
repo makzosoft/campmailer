@@ -15,3 +15,4 @@ api/push-key.js
 api/health.js
 api/cron/
 api/t/
+api/[...path].js
