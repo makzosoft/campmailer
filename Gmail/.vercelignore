@@ -1,0 +1,18 @@
+# Old per-route files from earlier versions. Everything now runs from api/[...path].js (one function).
+api/login.js
+api/send.js
+api/schedule-start.js
+api/schedule-status.js
+api/schedule-cancel.js
+api/schedule-pause.js
+api/unsub.js
+api/unsubscribes.js
+api/track-stats.js
+api/subscribe.js
+api/newsletters.js
+api/push.js
+api/push-key.js
+api/health.js
+api/cron/
+api/t/
+api/[...path].js
