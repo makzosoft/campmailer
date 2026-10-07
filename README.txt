@@ -6,17 +6,22 @@ person gets their own personalised email from your Gmail.
 
 IMPORTANT, ONE-TIME CLEAN-UP (fixes "no more than 12 serverless functions")
   Vercel's free plan allows 12 functions per deployment. v7 runs the whole
-  app as ONE function: api/[...path].js (the code for each address now lives
-  in lib/routes/). Every address is unchanged.
+  app as ONE function: api/index.js (the code for each address now lives
+  in lib/routes/). vercel.json sends every /api/... address and every
+  /join/... link to it. Every address is unchanged.
   After uploading, DELETE these old files from the api/ folder on GitHub,
   otherwise Vercel still counts them:
     api/login.js, api/send.js, api/schedule-start.js, api/schedule-status.js,
     api/schedule-cancel.js, api/schedule-pause.js, api/unsub.js,
     api/unsubscribes.js, api/track-stats.js, api/subscribe.js,
     api/newsletters.js, api/push.js, api/push-key.js, api/health.js,
+    api/[...path].js (if you uploaded the earlier attempt),
     and the two folders api/cron/ and api/t/.
-  When done, the api/ folder contains exactly one file: [...path].js
-  (Keep the square brackets and dots in that file name.)
+  When done, the api/ folder contains exactly one file: index.js
+  Then check, in this order, in your browser:
+    https://YOUR-APP.vercel.app/api            -> {"ok":true,"app":"CampMailer"}
+    https://YOUR-APP.vercel.app/api/health?key=YOUR_CRON_SECRET  -> "ok": true
+    https://YOUR-APP.vercel.app/api/cron/run?key=YOUR_CRON_SECRET -> {"ok":true,...}
 
 
 WHAT'S NEW IN v7
@@ -37,7 +42,7 @@ WHAT'S NEW IN v7
     cut off. The HTML preview is taller and grows to fit the email.
 
   UPGRADING FROM v6: upload ALL files (new: sw.js, manifest.webmanifest,
-  public/brand/, api/[...path].js, lib/routes/, lib/push.js, new vercel.json),
+  public/brand/, api/index.js, lib/routes/, lib/push.js, new vercel.json),
   run supabase-setup.sql again in Supabase (it adds one table, push_subs, and
   is safe to repeat), then redeploy.
 
