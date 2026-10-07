@@ -4,6 +4,21 @@ Load a list (CSV or Excel), write the message, press Send or Schedule. Each
 person gets their own personalised email from your Gmail.
 
 
+IMPORTANT, ONE-TIME CLEAN-UP (fixes "no more than 12 serverless functions")
+  Vercel's free plan allows 12 functions per deployment. v7 runs the whole
+  app as ONE function: api/[...path].js (the code for each address now lives
+  in lib/routes/). Every address is unchanged.
+  After uploading, DELETE these old files from the api/ folder on GitHub,
+  otherwise Vercel still counts them:
+    api/login.js, api/send.js, api/schedule-start.js, api/schedule-status.js,
+    api/schedule-cancel.js, api/schedule-pause.js, api/unsub.js,
+    api/unsubscribes.js, api/track-stats.js, api/subscribe.js,
+    api/newsletters.js, api/push.js, api/push-key.js, api/health.js,
+    and the two folders api/cron/ and api/t/.
+  When done, the api/ folder contains exactly one file: [...path].js
+  (Keep the square brackets and dots in that file name.)
+
+
 WHAT'S NEW IN v7
   - New CampMailer logo and brand (green tent + paper plane). Files are in
     public/brand/ (icon, light and dark logos, app icons).
@@ -22,7 +37,7 @@ WHAT'S NEW IN v7
     cut off. The HTML preview is taller and grows to fit the email.
 
   UPGRADING FROM v6: upload ALL files (new: sw.js, manifest.webmanifest,
-  public/brand/, api/push.js, api/push-key.js, lib/push.js, new vercel.json),
+  public/brand/, api/[...path].js, lib/routes/, lib/push.js, new vercel.json),
   run supabase-setup.sql again in Supabase (it adds one table, push_subs, and
   is safe to repeat), then redeploy.
 
