@@ -1,5 +1,5 @@
 /* CampMailer service worker: keeps the app opening fast (and offline), and shows push notifications. */
-const VERSION = 'cm-v7';
+const VERSION = 'cm-v8';
 const SHELL = ['/', '/manifest.webmanifest', '/brand/icon.svg', '/brand/icon-192.png', '/vendor/read-excel-file.min.js'];
 
 self.addEventListener('install', e => {
@@ -14,7 +14,7 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET' || url.origin !== location.origin) return;
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/join/') || url.pathname === '/sw.js') return;   // always live
   if (req.mode === 'navigate') {                                   // the page: newest first, saved copy when offline
-    e.respondWith(fetch(req).then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('/', copy)); return res; }).catch(() => caches.match('/')));
+    e.respondWith(fetch(req).then(res => { if (url.pathname === '/') { const copy = res.clone(); caches.open(VERSION).then(c => c.put('/', copy)); } return res; }).catch(() => caches.match(req).then(hit => hit || caches.match('/'))));
     return;
   }
   e.respondWith(caches.match(req).then(hit => {                    // pictures and libraries: instant, refreshed in the background

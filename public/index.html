@@ -416,7 +416,7 @@ tr.flash-sent .st,tr.flash-failed .st{animation:pop .45s var(--ease)}
 
 /* shared popup */
 .schedpop{animation:fadeIn .2s}
-.schedcard.wide{max-width:540px;max-height:92vh;overflow:auto;overscroll-behavior:contain}
+.schedcard.wide{max-width:540px;max-height:92vh;max-height:calc(100% - 10px);overflow:auto;overscroll-behavior:contain}
 .schedcard h3{font-size:17px}
 .schedcard .row.sticky{position:sticky;bottom:-22px;background:linear-gradient(transparent,var(--paper) 22%);padding:16px 0 0;margin-top:14px}
 
@@ -631,11 +631,12 @@ html[data-theme=dark] #installBar{background:linear-gradient(100deg,#0a3a2c,#0f6
 #pvFrame{background:#fff}
 
 /* ===== v7: analytics ===== */
-.anpop .schedcard{max-width:700px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:94vh}
+.anpop .schedcard{max-width:700px;padding:0;overflow:hidden;display:flex;flex-direction:column;max-height:94vh;max-height:calc(100% - 8px)}
 .an-head{flex:none;position:relative;padding:20px 22px 18px;background:linear-gradient(120deg,#0b5a41,#14946f 65%,#22b98b);color:#fff;overflow:hidden}
 .an-head::after{content:"";position:absolute;right:-30px;top:-40px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%);animation:glow 5s ease-in-out infinite}
 @keyframes glow{50%{transform:translate(-18px,12px) scale(1.15)}}
-.an-head h3{margin:0 0 3px;font-size:18px;color:#fff;padding-right:40px}
+.an-head h3{margin:0 0 3px;font-size:18px;color:#fff;padding-right:40px;overflow-wrap:anywhere;line-height:1.25}
+.an-head p{overflow-wrap:anywhere}
 .an-head p{margin:0;color:rgba(255,255,255,.85);font-size:12.5px}
 .an-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:20px;line-height:1;z-index:2;transition:transform .25s var(--ease),background .2s}
 .an-x:hover{background:rgba(255,255,255,.3);transform:rotate(90deg)}
@@ -707,6 +708,39 @@ html[data-theme=dark] #installBar{background:linear-gradient(100deg,#0a3a2c,#0f6
 .lbrand .logo{height:38px;width:auto}
 
 @media(max-width:900px){.panel-head{flex-wrap:wrap}.panel-head .acts{flex:1 1 100%;justify-content:flex-start;gap:2px 4px;margin:2px 0 0 -10px}}
+/* ===== v8: inbox check + warm-up ===== */
+.icbox{border-top:1px solid var(--line-soft);background:var(--paper-2);--col:var(--go-text)}
+.icbox.ok{--col:#e0a31f}.icbox.bad{--col:#e8685c}
+.ic-head{display:flex;align-items:center;gap:12px;width:100%;padding:12px 20px;border:0;background:none;text-align:left;color:var(--ink);cursor:pointer;transition:background .2s}
+.ic-head:hover{background:var(--row-hover)}
+.ic-gauge{position:relative;width:46px;height:46px;flex:none}
+.ic-gauge svg{width:46px;height:46px;transform:rotate(-90deg)}
+.ic-gauge .rg-bg{fill:none;stroke:var(--ring-bg);stroke-width:5}
+.ic-gauge .rg{fill:none;stroke:var(--col);stroke-width:5;stroke-linecap:round;stroke-dasharray:113.1;stroke-dashoffset:113.1;transition:stroke-dashoffset 1s cubic-bezier(.22,.9,.3,1),stroke .4s}
+.ic-num{position:absolute;inset:0;display:grid;place-items:center;font-weight:750;font-size:14px;font-variant-numeric:tabular-nums}
+.ic-txt{flex:1;min-width:0;line-height:1.3}
+.ic-txt b{display:block;font-size:14px}
+.ic-txt small{display:block;color:var(--muted);font-size:12.5px}
+.ic-chev{flex:none;color:var(--faint);transition:transform .35s var(--ease)}
+.icbox.open .ic-chev{transform:rotate(180deg)}
+.ic-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.icbox.open .ic-wrap{grid-template-rows:1fr}
+.ic-wrap>div{overflow:hidden}
+.ic-list{padding:2px 20px 16px;display:grid;gap:8px}
+.ic-item{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;border-radius:11px;background:var(--paper);border:1px solid var(--line-soft)}
+.icbox.open .ic-item{animation:fadeUp .4s var(--ease) both;animation-delay:calc(var(--i,0) * 45ms)}
+.ic-item i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:12px;color:#fff}
+.ic-item.fix i{background:#e8685c}.ic-item.tip i{background:#e0a31f}.ic-item.good i{background:var(--go)}
+.ic-item b{display:block;font-size:13.5px}
+.ic-item span{display:block;color:var(--muted);font-size:12.5px;line-height:1.4;margin-top:1px}
+.warmbox{margin-top:8px;padding:12px;border-radius:12px;background:var(--go-soft);display:grid;gap:10px;animation:fadeUp .35s var(--ease)}
+.warmbox .presets{display:flex;gap:6px;flex-wrap:wrap}
+.warmbox .dchip{background:var(--paper)}
+.warmbox .dchip.on{background:var(--go);border-color:var(--go);color:#fff}
+.schedcard .warmbox .sd-inline{color:var(--go-ink)}
+.ramp{display:flex;gap:4px;align-items:flex-end;height:44px}
+.ramp b{flex:1;min-width:6px;max-width:26px;border-radius:4px 4px 2px 2px;background:var(--go);opacity:.85;transform-origin:bottom;animation:rampUp .6s var(--ease) both;animation-delay:calc(var(--i,0) * 40ms)}
+@keyframes rampUp{from{transform:scaleY(0)}}
 /* bars stack on top of each other at any height */
 #schedBar{bottom:var(--sendH,66px)}
 .app{padding-bottom:calc(var(--sendH,66px) + var(--schedH,0px) + 36px)}
@@ -813,6 +847,14 @@ html[data-theme=dark] #installBar{background:linear-gradient(100deg,#0a3a2c,#0f6
         <label class="fl">Footer line <span style="font-weight:400">(optional, e.g. your business name and address)</span><input type="text" id="footerLine" maxlength="300" placeholder="Business name, address"></label>
         <div class="sub">Every email also gets an Unsubscribe link at the bottom. People who unsubscribe are skipped automatically, in every campaign.</div>
       </div>
+      <div class="icbox" id="icBox">
+        <button class="ic-head" id="icHead" type="button" aria-expanded="false">
+          <span class="ic-gauge"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="rg-bg" cx="22" cy="22" r="18"/><circle class="rg" id="icRg" cx="22" cy="22" r="18"/></svg><span class="ic-num" id="icNum">–</span></span>
+          <span class="ic-txt"><b>Inbox check</b><small id="icSub">Write your subject and message to see how spam filters may see it.</small></span>
+          <span class="ic-chev" aria-hidden="true">▾</span>
+        </button>
+        <div class="ic-wrap"><div><div class="ic-list" id="icList"></div></div></div>
+      </div>
     </section>
 
     <section class="panel" aria-label="Preview">
@@ -844,6 +886,12 @@ html[data-theme=dark] #installBar{background:linear-gradient(100deg,#0a3a2c,#0f6
       <h4>1. Daily limit</h4>
       <div class="help2">The most emails that will go out in one day. Gmail allows about 500 a day on a free account.</div>
       <div class="sd-inline"><input type="number" id="sdDaily" min="1" max="500" inputmode="numeric"> <span>emails a day at most</span></div>
+      <label class="swrow"><span><b>Warm up slowly</b><small>Recommended for a new sender. Starts small and builds up each day, which Gmail trusts more.</small></span><span class="switch"><input type="checkbox" id="sdWarm"><i></i></span></label>
+      <div class="warmbox" id="sdWarmBox" hidden>
+        <div class="presets" id="sdPresets"><button type="button" class="dchip" data-s="20" data-p="10">Gentle</button><button type="button" class="dchip" data-s="30" data-p="20">Steady</button><button type="button" class="dchip" data-s="50" data-p="50">Faster</button></div>
+        <div class="sd-inline">Day 1: <input type="number" id="sdWarmStart" min="1" max="500" inputmode="numeric"> emails, then <b>+</b><input type="number" id="sdWarmStep" min="1" max="500" inputmode="numeric"> more each sending day</div>
+        <div class="ramp" id="sdRamp"></div>
+      </div>
     </div>
 
     <div class="sd-sec" style="--i:1">
@@ -918,11 +966,12 @@ html[data-theme=dark] #installBar{background:linear-gradient(100deg,#0a3a2c,#0f6
       </div>
       <button class="btn" id="notifTest" type="button" hidden>Send a test notification</button>
     </div>
-    <div class="set-sec" id="installSec" style="--i:2"><h4>App</h4>
+    <div class="set-sec" style="--i:2"><h4>Help</h4><p class="help2" style="color:var(--muted);margin:0 0 8px">New here? The guide walks you through everything, from your first App Password to analytics.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn primary" href="/docs" target="_blank" rel="noopener">Open the guide</a><a class="btn" href="/guide/CampMailer-Quick-Guide.pdf" download>PDF quick guide</a></div></div>
+    <div class="set-sec" id="installSec" style="--i:3"><h4>App</h4>
       <p class="help2" style="margin:0 0 8px;color:var(--muted);font-size:12.5px">Put CampMailer on your home screen. It opens fast, works like an app and can send you alerts.</p>
       <button class="btn primary" id="setInstall" type="button">How to install</button>
     </div>
-    <div class="hfoot"><span class="sub">CampMailer 7</span><span style="flex:1"></span><button class="btn" id="setClose" type="button">Close</button></div>
+    <div class="hfoot"><span class="sub">CampMailer 8</span><span style="flex:1"></span><button class="btn" id="setClose" type="button">Close</button></div>
   </div>
 </div>
 <div class="schedpop" id="howPop" hidden>
@@ -977,6 +1026,7 @@ html[data-theme=dark] #installBar{background:linear-gradient(100deg,#0a3a2c,#0f6
         </ol>
       </div>
     </details>
+    <p class="stag" style="--i:5;text-align:center;margin:14px 0 0;font-size:13px"><a href="/docs" target="_blank" rel="noopener" style="color:var(--blue-text);font-weight:600">New here? Read the guide</a></p>
   </div>
 </div>
 <div id="dropOverlay" hidden><div>Drop a CSV or Excel file to load recipients</div></div>
@@ -1266,7 +1316,7 @@ function analyze() {
 /* ---------- rendering ---------- */
 let raf = 0;
 function render() { cancelAnimationFrame(raf); raf = requestAnimationFrame(renderNow); }
-function renderNow() { renderList(); renderCompose(); renderPreview(); renderBar(); save(); }
+function renderNow() { renderList(); renderCompose(); renderPreview(); renderBar(); renderInbox(); save(); }
 
 function trkChips(r) {
   const n = x => (x.count > 1 ? ' ×' + x.count : '');
@@ -1430,7 +1480,7 @@ function renderBar() {
   if (S.confirming && !b.length) {
     setBarState(el, 'confirm'); S.wasReady = false;
     el.innerHTML = '<div class="sendmsg"><div class="main">Send ' + plural(n, 'email') + ' from ' + esc(S.info.sender) + '?' + '</div><div class="note ' + (S.testSent ? '' : 'warn') + '">' +
-      (S.testSent ? 'You sent yourself a test. This cannot be undone.' : 'You haven\'t sent yourself a test yet. This cannot be undone.') + '</div></div>' +
+      (S.testSent ? 'You sent yourself a test. This cannot be undone.' : 'You haven\'t sent yourself a test yet. This cannot be undone.') + (n > 50 ? ' You are sending to ' + n + ' people at once. Scheduling in small groups is safer for your inbox rate.' : '') + (icLast && !icLast.empty && icLast.score < 65 ? ' <b>Inbox check: ' + icLast.score + ' (risky).</b> Open it above and fix the red items first.' : '') + '</div></div>' +
       '<div class="sendbtns"><button class="btn big" id="btnCancel" type="button">Cancel</button><button class="btn go big" id="btnConfirm" type="button">Yes, send ' + n + '</button></div>';
     return;
   }
@@ -1945,7 +1995,7 @@ function applyDetail(rows, d, getEmail) {
 function nextOpenTime(s, nowMs) {
   const now = nowMs == null ? Date.now() : nowMs;
   const base = Math.max(now, s.startAt ? new Date(s.startAt).getTime() : 0);
-  const today = localParts(new Date(now), s.tz).date, capHit = s.sentToday >= s.dailyLimit;
+  const today = localParts(new Date(now), s.tz).date, capHit = s.sentToday >= (s.todayLimit || s.dailyLimit);
   const open = t => {
     const p = localParts(new Date(t), s.tz);
     if (capHit && p.date === today) return false;
@@ -1967,7 +2017,7 @@ function fmtIn(tz, t) {
 function nextInfo(s) {
   if (s.status !== 'active') return '';
   const now = Date.now();
-  if (s.sentToday >= s.dailyLimit) { const t = nextOpenTime(s); return 'daily limit reached' + (t ? ', continues ' + fmtIn(s.tz, t) : ''); }
+  if (s.sentToday >= (s.todayLimit || s.dailyLimit)) { const t = nextOpenTime(s); return 'daily limit reached' + (t ? ', continues ' + fmtIn(s.tz, t) : ''); }
   const t = nextOpenTime(s);
   if (t && t - now > 15 * 60000 + 60000) return 'next send ' + fmtIn(s.tz, t);
   const lp = localParts(new Date(), s.tz), open = s.days.includes(lp.dow) && lp.minutes >= s.windowStart && lp.minutes < s.windowEnd;
@@ -1989,7 +2039,7 @@ function renderSchedule() {
   let note;
   if (finished) note = 'All done. Download the report any time.';
   else if (paused) note = s.lastError ? s.lastError : 'Paused. Nothing is being sent.';
-  else note = s.sentToday + ' of ' + s.dailyLimit + ' sent today' + (nextInfo(s) ? ' · ' + nextInfo(s) : '');
+  else note = s.sentToday + ' of ' + (s.todayLimit || s.dailyLimit) + ' sent today' + (s.warm && (s.todayLimit || 0) < s.dailyLimit ? ' (warming up, builds to ' + s.dailyLimit + ')' : '') + (nextInfo(s) ? ' · ' + nextInfo(s) : '');
   const btns = finished ? '<button type="button" id="schedReport">Download report</button><button type="button" id="schedDismiss">Dismiss</button>'
     : (paused ? '<button type="button" id="schedResume">Resume</button>' : '<button type="button" id="schedPause">Pause</button>') + '<button type="button" id="schedCancelInline">Cancel</button>';
   $('#schedin').innerHTML = '<div class="s-top"><span class="sdot"></span><span class="s-cnt"><b>' + (finished ? 'Finished' : paused ? 'Paused' : 'Scheduled') + '</b> · ' + esc(counts) + '</span><span class="s-pct">' + pct + '%</span></div>' +
@@ -2005,6 +2055,7 @@ async function pollSchedule() {
       const d = await scheduleApi.status(S.scheduleId, true), prev = S.sched;
       S.sched = d;
       const changed = applyDetail(S.rows, d, r => r.email);
+      if (changed && S.campaignId) setTimeout(pollTrack, 400);          // show Opened / Clicked right after rows refresh
       if (prev && prev.status === 'active' && d.status === 'done') { toast('Schedule finished: ' + d.sent + ' sent' + (d.failed ? ', ' + d.failed + ' failed' : '') + '.', d.failed ? '' : 'good'); if (!d.failed) confetti(); }
       if (prev && prev.status === 'active' && d.status === 'paused' && d.lastError) toast('Schedule paused: ' + d.lastError, 'bad');
       if (d.status === 'done' || d.status === 'canceled') S.scheduleId = null;
@@ -2052,6 +2103,8 @@ function openSchedule() {
   $('#sdEvery').value = String(p.every || 15);
   $('#sdFrom').value = toHHMM(p.from != null ? p.from : 480); $('#sdTo').value = toHHMM(p.to != null ? p.to : 1080);
   SD.days = new Set(p.days && p.days.length ? p.days : [1, 2, 3, 4, 5]); buildDayChips();
+  const w = p.warm || { on: +$('#sdDaily').value > 30, start: 20, step: 10 };
+  $('#sdWarm').checked = !!w.on; $('#sdWarmStart').value = w.start || 20; $('#sdWarmStep').value = w.step || 10; syncWarmUI();
   $('#sdStartNow').checked = true; $('#sdStartAt').hidden = true; $('#sdStartAt').value = '';
   $('#sdTz').textContent = 'Outside these hours nothing is sent. Your time zone: ' + TZ.replace(/_/g, ' ') + '.';
   $('#schedPop').hidden = false; updateSummary(true);
@@ -2059,21 +2112,34 @@ function openSchedule() {
 function readSched() {
   return { daily: clampInt($('#sdDaily').value, 1, 500, 50), per: clampInt($('#sdPer').value, 1, 20, 10), every: +$('#sdEvery').value || 15,
     from: toMin($('#sdFrom').value), to: toMin($('#sdTo').value), days: [...SD.days].sort((a, b) => a - b),
-    later: $('#sdStartLater').checked, startAt: $('#sdStartAt').value };
+    later: $('#sdStartLater').checked, startAt: $('#sdStartAt').value,
+    warm: $('#sdWarm').checked ? { start: clampInt($('#sdWarmStart').value, 1, 500, 20), step: clampInt($('#sdWarmStep').value, 1, 500, 10) } : null };
+}
+function syncWarmUI() {
+  const on = $('#sdWarm').checked; $('#sdWarmBox').hidden = !on;
+  const s = +$('#sdWarmStart').value, p = +$('#sdWarmStep').value;
+  $('#sdPresets').querySelectorAll('.dchip').forEach(b => b.classList.toggle('on', +b.dataset.s === s && +b.dataset.p === p));
+}
+function rampDays(v) {            // how many emails each sending day, while warming up
+  const out = []; if (!v.warm || v.warm.start >= v.daily) return out;
+  for (let d = 0; d < 60; d++) { const n = Math.min(v.daily, v.warm.start + v.warm.step * d); out.push(n); if (n >= v.daily) break; }
+  return out;
 }
 function schedMath(v, total) {
   const windowMin = v.to - v.from;
   const groups = Math.max(1, Math.ceil(windowMin / v.every));
   const perDay = Math.min(v.daily, groups * Math.min(v.per, v.daily));
   const start = v.later && v.startAt ? new Date(v.startAt) : new Date();
+  const ramp = rampDays(v);
   let left = total, n = 0, last = null; const day = new Date(start); day.setHours(12, 0, 0, 0);
   const nowMin = start.getHours() * 60 + start.getMinutes();
   for (let guard = 0; left > 0 && guard < 800; guard++, day.setDate(day.getDate() + 1)) {
     if (!v.days.includes(day.getDay())) continue;
     if (guard === 0 && nowMin >= v.to) continue;
-    left -= perDay; n++; last = new Date(day);
+    const cap = ramp.length && n < ramp.length ? ramp[n] : v.daily;
+    left -= Math.min(cap, groups * Math.min(v.per, cap)); n++; last = new Date(day);
   }
-  return { windowMin, groups, perDay, daysNeeded: n, finish: last };
+  return { windowMin, groups, perDay, daysNeeded: n, finish: last, ramp };
 }
 function updateSummary(first) {
   const v = readSched(), total = pending().length, box = $('#sdSummary'), btn = $('#schedStartBtn');
@@ -2087,14 +2153,17 @@ function updateSummary(first) {
   box.className = 'sd-sum' + (bad ? ' bad' : '');
   if (bad) { box.textContent = bad; return; }
   const m = schedMath(v, total), per = Math.min(v.per, v.daily);
-  let html = '<span class="big">Up to ' + m.perDay + ' emails a day</span>' +
+  let html = '<span class="big">' + (m.ramp.length ? 'Starts at ' + Math.min(m.ramp[0], m.perDay) + ' a day, builds to ' + m.perDay : 'Up to ' + m.perDay + ' emails a day') + '</span>' +
     '<b>' + total + '</b> ' + (total === 1 ? 'email' : 'emails') + ' will take about <b>' + plural(m.daysNeeded, 'sending day') + '</b>' + (m.finish ? ', done around ' + m.finish.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }) : '') + '.';
   if (m.perDay < v.daily) { html += '<span class="tip">You set ' + v.daily + ' a day, but these hours and gaps only fit ' + m.perDay + '. Use longer hours, shorter gaps, or more emails each time to reach ' + v.daily + '.</span>'; box.classList.add('warn'); }
   box.innerHTML = html;
+  { const rp = $('#sdRamp'); if (rp) rp.innerHTML = m.ramp.slice(0, 14).map((n, i) => '<b style="--i:' + i + ';height:' + Math.max(8, Math.round(n / v.daily * 100)) + '%" title="Day ' + (i + 1) + ': ' + n + '"></b>').join(''); }
   if (!first && !REDUCED) { box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash'); }
 }
 $('#schedPop').addEventListener('click', e => { if (e.target === e.currentTarget) $('#schedPop').hidden = true; });
-$('#schedPop').addEventListener('input', () => updateSummary());
+$('#schedPop').addEventListener('input', () => { syncWarmUI(); updateSummary(); });
+$('#sdWarm').addEventListener('change', () => { syncWarmUI(); updateSummary(); });
+$('#sdPresets').addEventListener('click', e => { const b = e.target.closest('[data-s]'); if (!b) return; $('#sdWarmStart').value = b.dataset.s; $('#sdWarmStep').value = b.dataset.p; syncWarmUI(); updateSummary(); });
 $('#schedPop').addEventListener('change', e => { if (e.target.name === 'sdStart') { $('#sdStartAt').hidden = !$('#sdStartLater').checked; if (!$('#sdStartAt').hidden && !$('#sdStartAt').value) { const d = new Date(Date.now() + 3600000); d.setMinutes(0, 0, 0); $('#sdStartAt').value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); } } updateSummary(); });
 $('#sdDays').addEventListener('click', e => {
   const b = e.target.closest('[data-d]'); if (!b) return; const d = +b.dataset.d;
@@ -2111,11 +2180,11 @@ $('#schedStartBtn').onclick = async () => {
   try {
     const rec = await scheduleApi.start({
       account: a, name: S.campaign || S.source, campaignId: S.campaignId || (S.campaignId = newCid()), trackOpens: S.trackOpens, trackClicks: S.trackClicks, footer: S.footer, subject: $('#subject').value.trim(), body: bodyVal().trim(), isHtml: S.bodyMode === 'html',
-      dailyLimit: v.daily, perBatch: Math.min(v.per, v.daily), intervalMin: v.every, windowStart: v.from, windowEnd: v.to, days: v.days, timezone: TZ,
+      dailyLimit: v.daily, perBatch: Math.min(v.per, v.daily), intervalMin: v.every, windowStart: v.from, windowEnd: v.to, days: v.days, timezone: TZ, warm: v.warm,
       startAt: v.later && v.startAt ? new Date(v.startAt).toISOString() : null,
       columns: S.columns, emailCol: S.emailCol, nameCol: S.nameCol, recipients: list.map(r => ({ email: r.email, data: r.data }))
     });
-    try { localStorage.setItem(PREFS_KEY, JSON.stringify({ daily: v.daily, per: v.per, every: v.every, from: v.from, to: v.to, days: v.days })); } catch (e) {}
+    try { localStorage.setItem(PREFS_KEY, JSON.stringify({ daily: v.daily, per: v.per, every: v.every, from: v.from, to: v.to, days: v.days, warm: { on: !!v.warm, start: (v.warm && v.warm.start) || +$('#sdWarmStart').value || 20, step: (v.warm && v.warm.step) || +$('#sdWarmStep').value || 10 } })); } catch (e) {}
     list.forEach(r => { r.status = 'queued'; r.selected = false; r.error = ''; });
     const sk = new Set((rec.skippedEmails || []).map(x => x.toLowerCase())); list.forEach(r => { if (sk.has(r.email.toLowerCase())) r.status = 'unsub'; });
     S.scheduleId = rec.id; S.sched = rec; S.schedDismissed = null; S.confirming = false;
@@ -2657,6 +2726,96 @@ function analyticsOfCurrent() {
 $('#anClose').onclick = () => { $('#anPop').hidden = true; };
 $('#anPop').addEventListener('click', e => { if (e.target === e.currentTarget) $('#anPop').hidden = true; });
 $('#btnAnalytics').onclick = () => analyticsOfCurrent();
+
+/* ---------- inbox check (spam-risk score, runs in your browser) ---------- */
+const SPAM_PHRASES = ['act now', 'buy now', 'order now', 'click here', 'click below', 'limited time', 'limited offer', '100% free', 'free money', 'guaranteed', 'you have won', "you've won", 'winner', 'congratulations', 'no obligation', 'risk free', 'risk-free', 'make money', 'earn money', 'extra cash', 'cash bonus', 'double your', 'lowest price', 'best price', 'special promotion', 'urgent', 'apply now', 'call now', 'dear friend', 'this is not spam', 'miracle', 'weight loss', 'lottery', 'no credit check', 'eliminate debt', 'work from home', 'once in a lifetime', 'what are you waiting for', 'amazing deal', 'satisfaction guaranteed', 'pre-approved', 'investment opportunity', 'get paid', 'viagra', 'casino'];
+const SHORT_RE = /https?:\/\/(www\.)?(bit\.ly|tinyurl\.com|t\.co|goo\.gl|ow\.ly|is\.gd|buff\.ly|cutt\.ly|rebrand\.ly|shorturl\.at|tiny\.cc|rb\.gy)\//i;
+function inboxCheck(o) {
+  const subj = String(o.subject || '').trim(), raw = String(o.body || '');
+  const text = (o.isHtml ? raw.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ') : raw).replace(/\s+/g, ' ').trim();
+  if (!subj && !text) return { empty: true, score: null, items: [] };
+  const items = []; let score = 100;
+  const add = (level, title, why, pts) => { items.push({ level, title, why }); score -= pts || 0; };
+  const words = text ? text.split(/\s+/).filter(Boolean).length : 0;
+  const lower = (subj + ' ' + text).toLowerCase();
+  const letters = s => s.replace(/[^A-Za-z]/g, '');
+
+  // ----- subject
+  if (!subj) add('fix', 'Add a subject', 'Emails with no subject are very often treated as spam.', 20);
+  else {
+    const L = letters(subj);
+    if (L.length >= 5 && L.replace(/[^A-Z]/g, '').length / L.length > 0.6) add('fix', 'Subject is in ALL CAPS', 'Shouting looks like spam. Write it like a normal sentence.', 15);
+    if ((subj.match(/!/g) || []).length >= 2) add('fix', 'Too many exclamation marks in the subject', 'One at most. Several look like a sales blast.', 10);
+    if (/^(re|fwd?):/i.test(subj)) add('fix', 'Subject pretends to be a reply or forward', 'Filters punish fake "Re:" and "Fwd:" subjects.', 12);
+    const sw = SPAM_PHRASES.filter(p => subj.toLowerCase().includes(p));
+    if (sw.length) add('fix', 'Spammy words in the subject: ' + sw.slice(0, 3).join(', '), 'Use plain words that describe what the email is about.', 12);
+    else if (/\bfree\b/i.test(subj)) add('tip', 'The word "free" in the subject', 'It can trigger filters. Try saying what they get instead.', 5);
+    if (subj.length > 70) add('tip', 'Long subject (' + subj.length + ' characters)', 'Phones cut it off. Aim for under 60.', 4);
+    if ((subj.match(/\p{Extended_Pictographic}/gu) || []).length > 2) add('tip', 'Many emojis in the subject', 'One is fine. A row of them looks promotional.', 4);
+  }
+  // ----- message body
+  if (text) {
+    if (words < 15) add('tip', 'Very short message (' + words + ' words)', 'A message that is only a link looks suspicious. Add a sentence or two.', 5);
+    else if (words > 500) add('tip', 'Very long message (' + fmtN(words) + ' words)', 'Shorter emails get read, and filters like them better.', 4);
+    const caps = text.split(/\s+/).filter(w => /^[A-Z]{4,}$/.test(w.replace(/[^A-Za-z]/g, ''))).length;
+    if (words >= 10 && caps / words > 0.12) add('fix', 'Too many ALL CAPS words', 'Use capitals only where they are normal (names, the start of sentences).', 10);
+    if ((text.match(/!/g) || []).length >= 4) add('fix', 'Too many exclamation marks', 'Keep it calm and professional.', 8);
+    const found = SPAM_PHRASES.filter(p => lower.includes(p));
+    if (found.length >= 3) add('fix', 'Spam-style phrases: ' + found.slice(0, 4).join(', '), 'Several at once is a strong spam signal. Reword them.', 18);
+    else if (found.length) add('tip', 'Spam-style phrase: ' + found.join(', '), 'One or two are usually fine, but plain wording is safer.', 6 * found.length);
+  }
+  const urls = [...new Set((raw.match(/https?:\/\/[^\s"'<>)\]]+/gi) || []).map(u => u.replace(/[.,;]+$/, '')))];
+  if (SHORT_RE.test(raw)) add('fix', 'Link shortener found (bit.ly, tinyurl…)', 'Spammers hide behind shortened links, so filters distrust them. Use the full link.', 15);
+  if (/https?:\/\/\d{1,3}(\.\d{1,3}){3}/.test(raw)) add('fix', 'A link points to a number (IP address)', 'Use a proper website address.', 15);
+  if (urls.length > 5) add('fix', plural(urls.length, 'link') + ' in one email', 'More than 3 or 4 links looks like a promotion. Keep only what matters.', 12);
+  else if (urls.length > 3) add('tip', plural(urls.length, 'link') + ' in one email', 'Fewer links (1 to 3) land in the inbox more often.', 5);
+  if (o.isHtml) {
+    const imgs = (raw.match(/<img\b/gi) || []).length;
+    if (imgs && words < 30) add('fix', 'Mostly pictures, very little text', 'Image-only emails are a classic spam pattern. Add real text.', 12);
+    if (/display\s*:\s*none|font-size\s*:\s*0|visibility\s*:\s*hidden/i.test(raw)) add('fix', 'Hidden text found', 'Hiding text in an email is a spam trick. Remove it.', 15);
+    if (/<(form|iframe|script|object|embed)\b/i.test(raw)) add('fix', 'Forms or scripts in the email', 'They are not allowed in email and are removed before sending.', 8);
+    const mism = [...raw.matchAll(/<a\b[^>]*href\s*=\s*["']https?:\/\/([^\/"']+)[^>]*>\s*(?:https?:\/\/)?([a-z0-9.-]+\.[a-z]{2,})[^<]*<\/a>/gi)].some(m => m[1].replace(/^www\./, '').toLowerCase() !== m[2].replace(/^www\./, '').toLowerCase());
+    if (mism) add('fix', 'A link shows one website but goes to another', 'This looks like phishing to filters. Make the text and link match.', 12);
+  }
+  if (/click here/i.test(text)) add('tip', 'Link text says "click here"', 'Describe where it goes instead, like "See the schedule".', 4);
+  // ----- personal touch, trust
+  const merged = /\{\{[^}]+\}\}/.test(subj + raw);
+  if ((o.people || 0) > 1 && !merged) add('tip', 'Not personalised', 'Add {{first_name}} so each email reads as written for that person.', 4);
+  if (!String(o.footer || '').trim()) add('tip', 'No footer line', 'Add your business name and address in the footer. It builds trust and is required in some countries.', 4);
+  if (o.trackOpens) add('tip', 'Counting opens is on', 'It adds a hidden picture. For a new sender, leave it off at first and count clicks only.', 3);
+  if ((o.people || 0) > 100) add('tip', 'Large list (' + fmtN(o.people) + ')', 'Do not send it all at once. Use Schedule with warm-up so it goes out in small groups over days.', 4);
+  if (/@(gmail|googlemail)\.com$/i.test(o.sender || '')) add('tip', 'Sending from a free Gmail address', 'Fine for small, personal-style emails. For regular marketing, a business domain earns more trust.', 3);
+  // ----- what is already right
+  items.push({ level: 'good', title: 'Unsubscribe link and Gmail one-click button', why: 'Added to every email automatically.' });
+  items.push({ level: 'good', title: 'Plain-text version included', why: 'Every email is sent with both versions, which filters like.' });
+  if (merged) items.push({ level: 'good', title: 'Personalised with merge fields', why: 'Each person gets their own version.' });
+  if (urls.length <= 3 && urls.length > 0) items.push({ level: 'good', title: 'Sensible number of links', why: 'A few links is ideal.' });
+  if (String(o.footer || '').trim()) items.push({ level: 'good', title: 'Footer with your details', why: 'Shows who the email is from.' });
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const rank = { fix: 0, tip: 1, good: 2 };
+  items.sort((a, b) => rank[a.level] - rank[b.level]);
+  return { score, items, label: score >= 85 ? 'Looks good' : score >= 65 ? 'Okay, a few fixes will help' : 'Risky: fix the red items first' };
+}
+let icTimer = 0, icLast = null;
+function inboxInput() {
+  return { subject: $('#subject').value, body: bodyVal(), isHtml: S.bodyMode === 'html', footer: S.footer, trackOpens: S.trackOpens, people: S.rows.filter(r => r.status !== 'invalid' && r.status !== 'duplicate').length, sender: S.info && S.info.sender };
+}
+function renderInbox() { clearTimeout(icTimer); icTimer = setTimeout(paintInbox, 350); }
+function paintInbox() {
+  const box = $('#icBox'); if (!box) return;
+  const r = inboxCheck(inboxInput()); icLast = r;
+  const rg = $('#icRg'), num = $('#icNum'), sub = $('#icSub'), body = $('#icList');
+  if (r.empty) { box.className = 'icbox' + (box.classList.contains('open') ? ' open' : ''); rg.style.strokeDashoffset = 113.1; num.textContent = '–'; sub.textContent = 'Write your subject and message to see how spam filters may see it.'; body.innerHTML = ''; return; }
+  const keep = box.classList.contains('open');
+  box.className = 'icbox ' + (r.score >= 85 ? '' : r.score >= 65 ? 'ok' : 'bad') + (keep ? ' open' : '');
+  rg.style.strokeDashoffset = (113.1 * (1 - Math.max(4, r.score) / 100)).toFixed(1);
+  const from = parseInt(num.textContent, 10);
+  if (REDUCED || isNaN(from)) num.textContent = r.score; else { const t0 = performance.now(), d = r.score - from; (function st(t) { const k = Math.min(1, (t - t0) / 600); num.textContent = Math.round(from + d * k); if (k < 1) requestAnimationFrame(st); })(t0); }
+  const fixes = r.items.filter(i => i.level === 'fix').length, tips = r.items.filter(i => i.level === 'tip').length;
+  sub.textContent = r.label + (fixes || tips ? ' · ' + (fixes ? plural(fixes, 'thing') + ' to fix' : '') + (fixes && tips ? ', ' : '') + (tips ? plural(tips, 'tip') : '') : '');
+  body.innerHTML = r.items.map((i, k) => '<div class="ic-item ' + i.level + '" style="--i:' + k + '"><i>' + (i.level === 'fix' ? '✕' : i.level === 'tip' ? '!' : '✓') + '</i><div><b>' + esc(i.title) + '</b><span>' + esc(i.why) + '</span></div></div>').join('');
+}
+$('#icHead').onclick = () => { const b = $('#icBox'); b.classList.toggle('open'); $('#icHead').setAttribute('aria-expanded', b.classList.contains('open')); if (b.classList.contains('open')) paintInbox(); };
 
 /* ---------- boot ---------- */
 function revealApp() {

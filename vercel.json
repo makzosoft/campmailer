@@ -12,6 +12,10 @@
   ],
   "rewrites": [
     {
+      "source": "/docs",
+      "destination": "/docs.html"
+    },
+    {
       "source": "/join/:id",
       "destination": "/api"
     },
@@ -49,6 +53,15 @@
     },
     {
       "source": "/brand/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
+    },
+    {
+      "source": "/guide/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
